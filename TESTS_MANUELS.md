@@ -7,7 +7,8 @@ Pour chaque test, cochez ✅ ou ❌. Pour chaque ❌, notez ce que vous avez vu 
 
 ## 0. Préparation (5 min)
 
-1. **Lancer l'app** : dans un terminal, depuis le dossier du projet, lancez `npm run dev`, puis ouvrez http://localhost:5173.
+1. **Version en ligne** (celle du jury) : https://louisbarbonet.github.io/NOVA360/ — tous les tests ci-dessous peuvent s'y faire, sauf la partie 7 (nouvel événement), réservée au poste de l'équipe.
+1. **Lancer l'app en local** : dans un terminal, depuis le dossier du projet, lancez `npm run dev`, puis ouvrez http://localhost:5173.
    - Si le port 5173 est déjà pris, le serveur tourne déjà (lancé par Claude) : ouvrez simplement l'URL.
 2. **Vérifier le fournisseur du chat** : le fichier `.env` doit contenir `NOVA_PROVIDER=gemini` et votre clé.
 3. **Garder le corpus brut ouvert** à côté (`NOVA_ETUDIANTS/Projet360_NOVA_ETUDIANTS/`). Le but est de vérifier que ce que dit l'app correspond **vraiment** aux fichiers d'origine, pas seulement que l'app « a l'air » juste.
