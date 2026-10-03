@@ -5,7 +5,9 @@ Mémoire opérationnelle du projet NOVA, établie à partir des 64 fichiers du c
 ## Ouvrir le rendu
 
 - **Sans installation (jury)** : ouvrir `dist/index.html` dans un navigateur. Tout fonctionne hors ligne : brief, Q01–Q10, chronologie, décisions, contradictions, actions, finances, sources, recherche et mises à jour. Seul le chat demande le mode développement.
-- **Mode complet (démo)** : `npm install`, copier `.env.example` en `.env` et y mettre une clé API Anthropic, puis `npm run dev` et ouvrir http://localhost:5173.
+- **Mode complet (démo)** : `npm install`, copier `.env.example` en `.env` et y mettre une clé API, puis `npm run dev` et ouvrir http://localhost:5173.
+  - **Claude (par défaut)** : `ANTHROPIC_API_KEY` (console.anthropic.com, crédits prépayés).
+  - **Gemini (secours gratuit)** : `NOVA_PROVIDER=gemini` et `GEMINI_API_KEY` (aistudio.google.com). Les quotas gratuits sont bas : l'app affiche un message clair quand ils sont atteints. `npm run gemini:models` liste les modèles disponibles pour `GEMINI_MODEL`.
 
 - **Livrables hors application** : `livrables/<version>/` contient le brief (Markdown + PDF d'une page), les réponses Q01–Q10 avec extraits, la mémoire et le dossier de décisions. On les régénère avec `npm run export`.
 
@@ -34,6 +36,7 @@ Mémoire opérationnelle du projet NOVA, établie à partir des 64 fichiers du c
 - **Claude Code (Claude Opus 5.5)** : lecture du corpus, transcription des 8 captures d'écran, rédaction de la mémoire de référence, développement.
 - **Claude Haiku 4.5** (API, configurable via `NOVA_MODEL`) : chat en langage naturel. Le corpus complet et la mémoire sont envoyés en contexte avec mise en cache ; il n'y a pas de base vectorielle.
 - **Claude Sonnet 5.5** (configurable via `NOVA_IMPACT_MODEL`) : brouillon d'analyse d'impact d'un nouvel événement.
+- **Google Gemini Flash** (secours, palier gratuit, `NOVA_PROVIDER=gemini`) : même rôle que Claude pour le chat et l'impact, sans mise en cache ; le corpus est renvoyé à chaque question.
 - **unpdf** (PDF), **SheetJS/xlsx** (Excel), décodeur MIME maison (courriels), **MiniSearch** (recherche), **Vite + TypeScript** (application).
 
 ## Traitements manuels
@@ -49,5 +52,5 @@ Mémoire opérationnelle du projet NOVA, établie à partir des 64 fichiers du c
 - La migration Canada Central est confirmée par un compte rendu de comité (M03), pas par une preuve technique brute.
 - Aucune instance **go/no-go** n'est planifiée, et aucun plan n'est prévu si la date dépasse la fin du contrat (31 oct.).
 - Les **recommandations de notre équipe** (responsable « proposé ») ne sont pas des engagements : elles sont distinguées partout.
-- Le **chat** peut se tromper ou mal citer : vérifier chaque preuve. Les réponses Q01–Q10 de la page dédiée sont celles qui ont été relues et validées.
+- Le **chat** peut se tromper ou mal citer : vérifier chaque preuve. Sur le palier gratuit de Gemini, les quotas (quelques dizaines de requêtes par jour) peuvent bloquer temporairement le chat. Les réponses Q01–Q10 de la page dédiée sont celles qui ont été relues et validées.
 - Les dates de fichiers ne sont pas fiables (README, règles de lecture) : seules la date et l'autorité du contenu comptent.

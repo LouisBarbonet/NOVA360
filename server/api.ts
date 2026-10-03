@@ -4,14 +4,11 @@ import type { IncomingMessage, ServerResponse } from "node:http";
 import { readFileSync, readdirSync, writeFileSync, mkdirSync, existsSync } from "node:fs";
 import { join } from "node:path";
 import { execFileSync } from "node:child_process";
-import Anthropic from "@anthropic-ai/sdk";
+import { assertConfigured, complete } from "./llm";
 
 const CORPUS = "data/corpus.json";
 const MEMORY = "data/memory";
 const EVENT_DIR = "NOVA_ETUDIANTS/Projet360_NOVA_ETUDIANTS/09_Nouvel_evenement";
-// Lus à l'appel : le .env est chargé par vite.config.ts après l'import de ce module
-const chatModel = () => process.env.NOVA_MODEL || "claude-haiku-4-5";
-const impactModel = () => process.env.NOVA_IMPACT_MODEL || chatModel();
 
 type Seg = { ref: string; text: string };
 type Src = { id: string; path: string; folder: string; segments: Seg[]; attachments: { filename: string; duplicateOf?: string }[] };
@@ -53,13 +50,6 @@ function memoryText(version: string): string {
   return out;
 }
 
-function client(): Anthropic {
-  if (!process.env.ANTHROPIC_API_KEY && !process.env.ANTHROPIC_AUTH_TOKEN) {
-    throw Object.assign(new Error("Aucune clé API : définissez ANTHROPIC_API_KEY dans le fichier .env, puis relancez npm run dev."), { status: 503 });
-  }
-  return new Anthropic();
-}
-
 async function readBody(req: IncomingMessage): Promise<string> {
   const chunks: Buffer[] = [];
   for await (const c of req) chunks.push(c as Buffer);
@@ -72,34 +62,21 @@ function send(res: ServerResponse, status: number, body: unknown) {
   res.end(JSON.stringify(body));
 }
 
-function textOf(msg: Anthropic.Message): string {
-  return msg.content.map((b) => (b.type === "text" ? b.text : "")).join("");
-}
-
 async function chat(body: { version?: string; messages: { role: "user" | "assistant"; content: string }[] }) {
   const version = body.version ?? "baseline";
   const asOf =
     version === "baseline"
       ? "Réponds selon l'état au 30 septembre 2026 à 09:00 (baseline), sans tenir compte d'événements postérieurs."
       : `Réponds selon l'état après la mise à jour ${version} ; si c'est pertinent, signale ce qui a changé par rapport au baseline.`;
-  const msg = await client().messages.create({
-    model: chatModel(),
-    max_tokens: 2000,
-    system: [
-      { type: "text", text: RULES },
-      // Bloc stable et volumineux mis en cache : chaque question suivante le relit à ~10 % du prix
-      { type: "text", text: `${memoryText(version)}\n\n=== CORPUS COMPLET ===\n${corpusText()}`, cache_control: { type: "ephemeral" } },
-    ],
-    messages: [...body.messages.slice(-10), { role: "user" as const, content: `(${asOf})` }].reduce<Anthropic.MessageParam[]>((acc, m) => {
-      // fusionne la consigne de date dans le dernier message utilisateur
-      const last = acc[acc.length - 1];
-      if (last && last.role === m.role) last.content = `${last.content as string}\n${m.content}`;
-      else acc.push({ role: m.role, content: m.content });
-      return acc;
-    }, []),
+  const out = await complete({
+    purpose: "chat",
+    rules: RULES,
+    knowledge: `${memoryText(version)}\n\n=== CORPUS COMPLET ===\n${corpusText()}`,
+    // la consigne de date est fusionnée dans le dernier message utilisateur
+    turns: [...body.messages.slice(-10), { role: "user", content: `(${asOf})` }],
+    maxTokens: 2000,
   });
-  if (msg.stop_reason === "refusal") throw new Error("Le modèle a refusé de répondre.");
-  return { answer: textOf(msg), model: msg.model, usage: msg.usage };
+  return { answer: out.text, provider: out.provider, model: out.model };
 }
 
 const IMPACT_SCHEMA = `{
@@ -125,7 +102,7 @@ function newEventSources(): Src[] {
 }
 
 async function ingestEvent(body: { title: string; text?: string }) {
-  const api = client(); // échoue avant toute écriture si la clé manque
+  assertConfigured(); // échoue avant toute écriture si la clé manque
   if (body.text?.trim()) {
     mkdirSync(EVENT_DIR, { recursive: true });
     const slug = body.title.normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^A-Za-z0-9]+/g, "_").replace(/^_|_$/g, "").slice(0, 50);
@@ -138,14 +115,12 @@ async function ingestEvent(body: { title: string; text?: string }) {
 
   const nextVersion = `U${updateFiles().length + 1}`;
   const eventText = fresh.map((s) => `##### ${s.id} (${s.path})\n${s.segments.map((g) => `${g.ref}\t${g.text}`).join("\n")}`).join("\n\n");
-  const msg = await api.messages.create({
-    model: impactModel(),
-    max_tokens: 12000,
-    system: [
-      { type: "text", text: RULES },
-      { type: "text", text: `${memoryText("latest")}\n\n=== CORPUS COMPLET ===\n${corpusText()}`, cache_control: { type: "ephemeral" } },
-    ],
-    messages: [
+  const out = await complete({
+    purpose: "impact",
+    rules: RULES,
+    knowledge: `${memoryText("latest")}\n\n=== CORPUS COMPLET ===\n${corpusText()}`,
+    maxTokens: 12000,
+    turns: [
       {
         role: "user",
         content: `Un NOUVEL ÉVÉNEMENT vient d'arriver. Intègre-le à la mémoire SANS modifier le baseline : produis une mise à jour ${nextVersion}.
@@ -163,7 +138,7 @@ ${IMPACT_SCHEMA}`,
       },
     ],
   });
-  const raw = textOf(msg);
+  const raw = out.text;
   const json = raw.slice(raw.indexOf("{"), raw.lastIndexOf("}") + 1);
   let draft: unknown;
   try {

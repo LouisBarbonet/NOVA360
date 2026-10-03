@@ -10,7 +10,8 @@
     "extract": "tsx scripts/extract.ts",
     "validate": "tsx scripts/validate.ts",
     "test": "vitest run",
-    "export": "npm run build && tsx scripts/export.ts"
+    "export": "npm run build && tsx scripts/export.ts",
+    "gemini:models": "tsx scripts/gemini-models.ts"
   },
   "devDependencies": {
     "@types/node": "^26.6.4",
@@ -26,6 +27,7 @@
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.131.0",
+    "@google/genai": "^2.27.0",
     "minisearch": "^7.2.0"
   }
 }

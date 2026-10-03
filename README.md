@@ -16,7 +16,7 @@ Défi Loto-Québec « Projet 360 / NOVA ». C'est une mémoire consultable et so
 ## Démarrage rapide
 
 - **Jury, sans installation :** ouvrir `dist/index.html` (export autonome, hors ligne, aucun abonnement requis).
-- **Équipe :** `npm install`, puis `npm run dev` (chat et intégration d'événements : clé API dans `.env`, voir `.env.example`).
+- **Équipe :** `npm install`, puis `npm run dev`. Le chat et l'intégration d'événements demandent une clé dans `.env` (voir `.env.example`) : Claude par défaut, ou Gemini gratuit en secours avec `NOVA_PROVIDER=gemini`.
 
 ## Commandes
 
@@ -26,3 +26,4 @@ Défi Loto-Québec « Projet 360 / NOVA ». C'est une mémoire consultable et so
 | `npm run validate` | Vérifie que chaque citation de la mémoire pointe vers un passage réel |
 | `npm test` | Rendu de toutes les pages, surlignage des preuves, montants, superposition des mises à jour |
 | `npm run export` | Construit `dist/` et régénère `livrables/` (Markdown + PDF du brief, par version) |
+| `npm run gemini:models` | Liste les modèles Gemini accessibles avec la clé (pour régler `GEMINI_MODEL`) |
