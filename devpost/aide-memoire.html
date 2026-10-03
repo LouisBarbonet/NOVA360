@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Aide-mémoire — présentation NOVA 360</title>
+<style>
+  @page { size: letter; margin: 9mm 10mm; }
+  * { box-sizing: border-box; }
+  body { font: 10.6px/1.34 system-ui, "Segoe UI", sans-serif; color: #1b1f24; margin: 0; }
+  h1 { font-size: 17px; margin: 0 0 2px; }
+  h2 { font-size: 11.5px; margin: 7px 0 3px; padding-bottom: 1px; border-bottom: 1.5px solid #1f4e8c; color: #1f4e8c; text-transform: uppercase; letter-spacing: .03em; }
+  .pitch { background: #e6eef8; border-left: 4px solid #1f4e8c; padding: 4px 7px; font-size: 11.5px; font-weight: 600; margin: 4px 0 2px; }
+  .links { color: #5d6673; margin-bottom: 2px; }
+  .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 0 12px; }
+  table { border-collapse: collapse; width: 100%; }
+  td { padding: 1.5px 4px; vertical-align: top; border-bottom: 1px solid #e3e6ea; }
+  td:first-child { white-space: nowrap; font-weight: 700; color: #1f4e8c; width: 1%; }
+  ul { margin: 0; padding-left: 13px; }
+  li { margin: 1px 0; }
+  .ref { color: #5d6673; font-size: 9.4px; }
+  .warn { background: #fbe5e3; border-left: 4px solid #a3261f; padding: 3px 6px; margin-top: 3px; }
+  b { font-weight: 700; }
+</style>
+</head>
+<body>
+<h1>NOVA 360 — aide-mémoire de présentation</h1>
+<div class="links">Site : <b>louisbarbonet.github.io/NOVA360</b> · Code : github.com/LouisBarbonet/NOVA360 · Plan B hors ligne : NOVA360_remise.zip → dist/index.html</div>
+<div class="pitch">« Reprendre un projet sans se fier à la mauvaise info : NOVA 360 relie chaque réponse à sa preuve, tranche les contradictions et intègre les nouveautés sans effacer l'historique. »</div>
+
+<div class="cols">
+<div>
+<h2>Déroulé de la démo (≈ 6 min)</h2>
+<table>
+<tr><td>0:00</td><td><b>Problème</b> : 64 fichiers qui se contredisent. Le plan dit 15 oct., le comité a approuvé le 22 ; le rapport dit « sécurité au vert », mais le correctif n'est que livré.</td></tr>
+<tr><td>0:30</td><td><b>Brief 1 page</b> : les 5 thèmes et les 3 conditions de go-live reliées à des actions, responsables et échéances (« à confirmer » si inconnues).</td></tr>
+<tr><td>1:15</td><td><b>Q10 → clic sur la preuve</b> : capture du runbook, étape 4 retour arrière TODO, étape 5 « À compléter ». <i>« Chaque réponse cite un fichier et un repère. »</i></td></tr>
+<tr><td>2:00</td><td><b>Contradiction C-02</b> : registre du 29 sept. « Ouvert » contre INT-101 fermé le 17. Tranchée par la <b>date des faits</b>, pas par la date du fichier.</td></tr>
+<tr><td>2:45</td><td><b>Chronologie Sécurité</b> : livraison 19 sept. ≠ validation (toujours EN VALIDATION).</td></tr>
+<tr><td>3:15</td><td><b>Chat</b> : « Qui a approuvé CR-04? » → <b>Personne</b> (réponse pré-enregistrée), puis une question libre du jury.</td></tr>
+<tr><td>3:45</td><td><b>Nouvel événement</b> (2 min) : coller → analyser → <b>relire</b> → enregistrer → basculer la version Baseline ↔ U1 → encadré violet du brief.</td></tr>
+<tr><td>5:45</td><td><b>Limites</b> (voir à droite) et conclusion : le pitch.</td></tr>
+</table>
+
+<h2>Réponses Q01–Q10 (si le jury creuse)</h2>
+<table>
+<tr><td>Q01</td><td><b>22 oct. 2026</b>, conditionnelle : SEC-210 validé, ACC-303 fermé, runbook avec retour arrière approuvé. <span class="ref">M04 L17-23 · M06 L11-16</span></td></tr>
+<tr><td>Q02</td><td>Connecteur INT-101 (jeton expiré, erreurs 401) ; <b>fermé le 17 sept.</b> (120/120). R-01 « Ouvert » = périmé. <span class="ref">INT-101 L17-20</span></td></tr>
+<tr><td>Q03</td><td><b>Proposé</b> par Boréal le 8 sept. ; <b>approuvé</b> par le comité de direction le 10 sept. <span class="ref">E05 · M04</span></td></tr>
+<tr><td>Q04</td><td><b>Nicolas Perron</b> depuis le 16 sept. (Élodie avant). <span class="ref">E06 L3</span></td></tr>
+<tr><td>Q05</td><td><b>204 000 $</b> = 180 000 $ du contrat + 24 000 $ CR-01 ; CR-04 exclu. Payé : 132 000 $.</td></tr>
+<tr><td>Q06</td><td>INV-003 : <b>18 000 $ pour CR-04</b>, brouillon non approuvé ; seuls les 36 000 $ du jalon 3. Facture corrigée = <i>recommandation</i>.</td></tr>
+<tr><td>Q07</td><td><b>Canada Central</b> (ADR-007) ; déclaré par Boréal (E03) puis vérifié par l'architecture (M03). PJ ≠ preuve indépendante.</td></tr>
+<tr><td>Q08</td><td><b>Non</b> : livré le 19 sept., <b>pas validé</b> (EN VALIDATION, re-test sans date).</td></tr>
+<tr><td>Q09</td><td><b>Non</b> : ACC-301/302 fermés ; <b>ACC-303 ouvert</b> (Tab n'atteint pas « Enregistrer »).</td></tr>
+<tr><td>Q10</td><td>3 conditions ci-dessus ; runbook : <b>étape 4 retour arrière</b> (TODO), <b>étape 5 validation post-déploiement</b> (À compléter).</td></tr>
+</table>
+</div>
+
+<div>
+<h2>Nouvel événement : règles de relecture</h2>
+<ul>
+<li>Distinguer <b>statut du problème</b>, <b>décision antérieure</b> et <b>nouvelle proposition</b>.</li>
+<li><b>Aucune approbation inventée</b>. « Livré » n'est pas « validé », « proposé » n'est pas « décidé ».</li>
+<li><b>Ne fermer aucune autre condition</b> sans preuve : elle va dans « ce qui ne change pas ».</li>
+<li>Chaque changement est sourcé (nouvelle source + corpus). Vérifier les calculs de dates.</li>
+<li>Le baseline reste intact. Ensuite : <code>npm run worker:deploy</code>, puis commit + push (site à jour en ≈ 1 min).</li>
+<li>Si l'analyse LLM échoue : remplir le JSON à la main dans le formulaire (il est éditable).</li>
+</ul>
+
+<h2>Questions probables du jury</h2>
+<table>
+<tr><td>Fiabilité?</td><td>Faits tirés du corpus seulement. <b>278 citations vérifiées automatiquement</b> (ligne, page, cellule, capture). 36 tests.</td></tr>
+<tr><td>Hallucinations?</td><td>Validateur + citation <b>rouge</b> si repère introuvable + relecture humaine. Cas réel : 3 repères inventés détectés et corrigés.</td></tr>
+<tr><td>Pourquoi pas de RAG?</td><td>Le corpus tient dans le contexte du modèle : rien n'est oublié par une recherche imparfaite.</td></tr>
+<tr><td>Si Gemini tombe?</td><td>Cache, modèle de repli, 12 réponses pré-enregistrées, export hors ligne : la démo ne dépend pas de l'IA.</td></tr>
+<tr><td>Coût / sécurité?</td><td>Gratuit (Pages, Workers, Gemini). Clé secrète dans le relais ; limites par visiteur et par jour.</td></tr>
+<tr><td>Outils, manuel?</td><td>Claude Code : transcription des captures et rédaction de la mémoire, <b>relue par l'équipe</b> ; Gemini : chat de démo.</td></tr>
+</table>
+
+<h2>Limites à énoncer nous-mêmes</h2>
+<ul>
+<li>Échéances <b>non documentées</b> : re-test SEC-210, build ACC-303, runbook final → « à confirmer ».</li>
+<li>Acceptation du <b>jalon 3</b> (36 000 $) non prouvée ; migration Canada prouvée par un CR, pas une preuve technique.</li>
+<li>Aucune instance <b>go/no-go</b> planifiée ; contrat jusqu'au 31 oct. (marge de 9 jours).</li>
+<li>Le chat peut se tromper : les réponses Q01–Q10 relues font foi.</li>
+</ul>
+
+<h2>Chiffres à citer</h2>
+<p style="margin:0">64 fichiers · 8 captures transcrites · 35 événements · 7 décisions · <b>8 contradictions résolues</b> · 13 actions (5 engagements, 8 recommandations) · 8 informations manquantes · 278 citations vérifiées · brief 1 page · baseline intact.</p>
+
+<div class="warn"><b>Avant de monter :</b> ouvrir le site et l'onglet « Mise à jour » en local (<code>npm run dev</code>) ; vérifier que le sélecteur ne montre que le Baseline ; garder le zip prêt ; ménager le quota Gemini.</div>
+</div>
+</div>
+</body>
+</html>

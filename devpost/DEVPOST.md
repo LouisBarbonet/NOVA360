@@ -3,6 +3,10 @@
 > À copier champ par champ dans Devpost. Les captures se trouvent dans `devpost/captures/` (ordre et légendes ci-dessous).
 > ⚠ Après la nouvelle information du jour J : remplacer les captures 13 à 15 (actuellement une **répétition avec un événement simulé**) et mettre à jour la section « What it does → Après la nouvelle information ».
 
+## Elevator pitch (champ « tagline », 200 caractères max — 176 utilisés)
+
+Reprendre un projet sans se fier à la mauvaise info : NOVA 360 relie chaque réponse à sa preuve, tranche les contradictions et intègre les nouveautés sans effacer l’historique.
+
 ---
 
 ## Captures d'écran (galerie Devpost, dans cet ordre)
