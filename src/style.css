@@ -65,14 +65,16 @@ code, .mono { font-family: ui-monospace, "Cascadia Mono", Consolas, monospace; f
 body:not([data-version="baseline"]) .topbar { border-bottom: 3px solid var(--changed); }
 
 .layout { display: grid; grid-template-columns: 210px 1fr; min-height: calc(100vh - 50px); }
-nav { padding: 1rem .6rem; border-right: 1px solid var(--line); display: flex; flex-direction: column; gap: 2px; }
+nav { padding: 1rem .6rem; border-right: 1px solid var(--line); display: flex; flex-direction: column; gap: 2px;
+  position: sticky; top: 50px; align-self: start; max-height: calc(100vh - 50px); overflow-y: auto; }
+[id], .seg { scroll-margin-top: 70px; }
 nav a { padding: .4rem .7rem; border-radius: 6px; text-decoration: none; color: var(--ink); }
 nav a:hover { background: var(--bg); }
 nav a.active { background: var(--info-bg); color: var(--info); font-weight: 600; }
 main { padding: 1.4rem clamp(1rem, 3vw, 2.4rem) 4rem; max-width: 1150px; min-width: 0; }
 @media (max-width: 760px) {
   .layout { grid-template-columns: 1fr; }
-  nav { flex-direction: row; flex-wrap: wrap; border-right: 0; border-bottom: 1px solid var(--line); }
+  nav { position: static; max-height: none; flex-direction: row; flex-wrap: wrap; border-right: 0; border-bottom: 1px solid var(--line); }
 }
 
 .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: .8rem; }

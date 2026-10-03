@@ -281,7 +281,7 @@ function getIndex() {
     fields: ["text", "title"],
     storeFields: ["sid", "ref", "text"],
     processTerm: (t) => t.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase(),
-    searchOptions: { prefix: true, fuzzy: 0.15, boost: { title: 2 } },
+    searchOptions: { prefix: true, fuzzy: 0.15, boost: { title: 2 }, combineWith: "AND" },
   });
   index.addAll(
     corpus.sources.flatMap((s) =>

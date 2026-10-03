@@ -52,6 +52,8 @@ Types : **proposition** (suggérée), **décision** (prise par l'autorité), **l
 | 2026-09-23 | risque | Les Finances demandent l'approbation de CR-04 avant de libérer INV-003 | `E07 L3-L5` |
 | 2026-09-24 | décision | Décision de portée : CR-04 reporté en phase 2, aucune dépense sans approbation | `Decision_Portee_Phase2 L3-L6`, `E10 L3-L5` |
 | 2026-09-25 | risque | OPS-601 : runbook pas prêt (retour arrière TODO) | `OPS-601 L3-L14`, `OPS-601_runbook capture` |
+| 2026-09-26 | fait | Comité : fix SEC-210 livré mais acceptation sécurité NON donnée ; re-test planifié, statut maintenu EN VALIDATION | `M06 L6-L7`, `SEC-210 L25` |
+| 2026-09-26 | fait | ACC-303 toujours ouvert, jugé bloquant avant production ; correctif annoncé pour la prochaine build | `ACC-303 L16`, `M06 L9`, `M06 L15` |
 | 2026-09-26 | décision | Comité : le 22 oct. reste la cible, CONDITIONNELLE à trois éléments | `M06 L11-L16` |
 | 2026-09-27 | fait | Rappel de Nicolas : ne pas communiquer le 22 comme un go garanti | `E09 L3-L7` |
 | 2026-09-29 | fait | Olivier : toujours pas de version finale du runbook | `OPS-601 L16` |
