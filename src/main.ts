@@ -70,7 +70,9 @@ function render() {
   app.innerHTML = (views[route] ?? views.brief)();
   document.querySelectorAll("nav a").forEach((a) => a.classList.toggle("active", a.getAttribute("href") === `#/${route}`));
 
-  if (route === "source") document.querySelector("[data-hl]")?.scrollIntoView({ block: "center" });
+  // ?noscroll=1 : pas de défilement automatique (captures d'écran en mode headless)
+  if (params.get("noscroll")) window.scrollTo(0, 0);
+  else if (route === "source") document.querySelector("[data-hl]")?.scrollIntoView({ block: "center" });
   else if (params.get("d")) document.getElementById(params.get("d")!)?.scrollIntoView();
   else window.scrollTo(0, 0);
   bind(route);
