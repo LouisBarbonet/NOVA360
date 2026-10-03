@@ -15,7 +15,8 @@ Défi Loto-Québec « Projet 360 / NOVA ». C'est une mémoire consultable et so
 
 ## Démarrage rapide
 
-- **Jury, sans installation :** ouvrir `dist/index.html` (export autonome, hors ligne, aucun abonnement requis).
+- **Jury, en ligne :** **https://louisbarbonet.github.io/NOVA360/**. Aucune installation, chat compris (clé gardée secrète par un relais Cloudflare, quotas limités ; voir le mode d'emploi).
+- **Jury, hors ligne :** ouvrir `dist/index.html` (export autonome dans `NOVA360_remise.zip`, aucun abonnement requis).
 - **Équipe :** `npm install`, puis `npm run dev`. Le chat et l'intégration d'événements demandent une clé dans `.env` (voir `.env.example`) : Claude par défaut, ou Gemini gratuit en secours avec `NOVA_PROVIDER=gemini`.
 
 ## Commandes
@@ -29,3 +30,5 @@ Défi Loto-Québec « Projet 360 / NOVA ». C'est une mémoire consultable et so
 | `npm run gemini:models` | Liste les modèles Gemini accessibles avec la clé (pour régler `GEMINI_MODEL`) |
 | `npm run package` | Refait l'export puis `NOVA360_remise.zip` (app autonome + livrables + mode d'emploi), avec contrôle anti-clé API |
 | `npm run cache:clear` | Vide le cache des réponses du chat (`.cache/llm/`) |
+| `npm run precompute` | Pré-enregistre les réponses aux questions d'exemple et aux questions pièges (`data/precomputed/`, à relire) |
+| `npm run worker:deploy` | Redéploie le relais Cloudflare du chat avec la mémoire à jour (après un nouvel événement) |

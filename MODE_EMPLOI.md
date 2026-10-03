@@ -4,7 +4,12 @@ Mémoire opérationnelle du projet NOVA, établie à partir des 64 fichiers du c
 
 ## Ouvrir le rendu
 
-- **Sans installation (jury)** : ouvrir `dist/index.html` dans un navigateur. Tout fonctionne hors ligne : brief, Q01–Q10, chronologie, décisions, contradictions, actions, finances, sources, recherche et mises à jour. Seul le chat demande le mode développement.
+- **En ligne (jury, recommandé)** : **https://louisbarbonet.github.io/NOVA360/**. Aucune installation ni aucun compte. Tout fonctionne, chat compris.
+  - Les **questions d'exemple** et quelques **questions pièges** ont une réponse pré-enregistrée : affichage instantané, mention 📌.
+  - Les **questions libres** passent par un relais Cloudflare Worker, qui garde la clé Gemini secrète (elle n'est jamais envoyée au navigateur). Limites : 6 questions par minute et par visiteur, 150 questions libres par jour au total. Les questions déjà posées sont servies depuis le cache (mention ⚡) et ne comptent pas.
+  - Si Gemini est surchargé ou si le quota est atteint, un message l'indique ; les réponses pré-enregistrées et toutes les autres pages restent disponibles.
+  - L'intégration d'un nouvel événement n'est pas exposée en ligne : elle se fait sur le poste de l'équipe, puis la nouvelle version est publiée.
+- **Sans connexion** : ouvrir `dist/index.html` (dans `NOVA360_remise.zip`). Tout fonctionne hors ligne, sauf les questions libres du chat ; les réponses pré-enregistrées restent disponibles.
 - **Mode complet (démo)** : `npm install`, copier `.env.example` en `.env` et y mettre une clé API, puis `npm run dev` et ouvrir http://localhost:5173.
   - **Claude (par défaut)** : `ANTHROPIC_API_KEY` (console.anthropic.com, crédits prépayés).
   - **Gemini (secours gratuit)** : `NOVA_PROVIDER=gemini` et `GEMINI_API_KEY` (aistudio.google.com). Les quotas gratuits sont bas : l'app affiche un message clair quand ils sont atteints. `npm run gemini:models` liste les modèles disponibles pour `GEMINI_MODEL`.

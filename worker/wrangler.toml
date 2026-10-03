@@ -14,7 +14,7 @@ DAILY_LIMIT = "150"
 
 [[kv_namespaces]]
 binding = "NOVA_KV"
-id = "A_REMPLIR"
+id = "5b3a1463b4764f7589fa50ac81c23a06"
 
 # 6 questions par minute et par adresse IP
 [[ratelimits]]
