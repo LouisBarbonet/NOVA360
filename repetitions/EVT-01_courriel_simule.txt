@@ -1,0 +1,16 @@
+Date: Thu, 01 Oct 2026 10:12:00 -0400
+From: Julien Moreau <julien.moreau@boreal.example>
+To: nicolas.perron@demo.example
+Cc: melissa.gagnon@demo.example, olivier.cote@demo.example
+Subject: NOVA - build 2026.09.30 et calendrier
+
+Bonjour Nicolas,
+
+La build 2026.09.30 est déployée en validation depuis ce matin. Elle contient le correctif ACC-303 (piège de focus dans la modale de modification). Mélissa peut refaire son passage clavier quand elle le souhaite.
+
+Pour le runbook, notre équipe ops a besoin de plus de temps pour rédiger une procédure de retour arrière exécutable : la version finale est prévue pour le 14 octobre.
+
+Compte tenu de ce délai, nous recommandons de déplacer la mise en production au 29 octobre. Il s'agit d'une proposition de notre part ; la décision vous appartient.
+
+Julien
+Boréal Numérique

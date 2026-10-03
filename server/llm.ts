@@ -44,7 +44,7 @@ function alternate(turns: Turn[]): Turn[] {
  * @param rules consignes courtes
  * @param knowledge bloc volumineux et stable (mémoire + corpus), mis en cache côté Claude
  */
-export async function complete(opts: { purpose: Purpose; rules: string; knowledge: string; turns: Turn[]; maxTokens: number }): Promise<Completion> {
+export async function complete(opts: { purpose: Purpose; rules: string; knowledge: string; turns: Turn[]; maxTokens: number; json?: boolean }): Promise<Completion> {
   assertConfigured();
   const model = modelFor(opts.purpose);
   const turns = alternate(opts.turns);
@@ -70,7 +70,7 @@ const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 // Surcharge temporaire côté Google (503/500) : on réessaie, puis on bascule sur un modèle de repli
 const isOverloaded = (e: unknown) => e instanceof ApiError && (e.status === 503 || e.status === 500);
 
-async function gemini(model: string, opts: { rules: string; knowledge: string; maxTokens: number }, turns: Turn[]): Promise<Completion> {
+async function gemini(model: string, opts: { rules: string; knowledge: string; maxTokens: number; json?: boolean }, turns: Turn[]): Promise<Completion> {
   const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
   const fallback = process.env.GEMINI_FALLBACK_MODEL || "gemini-flash-lite-latest";
   const attempts = [model, model, model, ...(fallback !== model ? [fallback] : [])];
@@ -81,7 +81,12 @@ async function gemini(model: string, opts: { rules: string; knowledge: string; m
         const res = await ai.models.generateContent({
           model: current,
           contents: turns.map((t) => ({ role: t.role === "assistant" ? "model" : "user", parts: [{ text: t.content }] })),
-          config: { systemInstruction: `${opts.rules}\n\n${opts.knowledge}`, maxOutputTokens: opts.maxTokens },
+          config: {
+            systemInstruction: `${opts.rules}\n\n${opts.knowledge}`,
+            maxOutputTokens: opts.maxTokens,
+            // Mode JSON natif de Gemini : sortie garantie syntaxiquement valide
+            ...(opts.json ? { responseMimeType: "application/json" } : {}),
+          },
         });
         const text = res.text;
         if (!text) throw httpError(`Gemini n'a renvoyé aucun texte (motif : ${res.candidates?.[0]?.finishReason ?? "inconnu"}).`, 502);

@@ -9,6 +9,22 @@ const isChanged = (m: Memory, key: string) => (m.changed?.has(key) ? " changed" 
 const changedTag = (m: Memory, key: string) => (m.changed?.has(key) ? `<span class="tag-changed">modifié · ${esc(m.version)}</span>` : "");
 
 // ───────────────────────── Brief ─────────────────────────
+/** Encadré « changements depuis le baseline » : généré à partir des mises à jour, sans dépendre du LLM. */
+function updateBanner(m: Memory): string {
+  if (m.version === "baseline") return "";
+  const applied = updates.slice(0, updates.findIndex((u) => u.version === m.version) + 1);
+  return `<div class="update-banner">
+    <strong>Changements depuis le baseline du 30 sept.</strong> — le reste du brief est inchangé.
+    ${applied
+      .map(
+        (u) => `<p><strong>${esc(u.version)} — ${esc(u.event.title)}</strong> ${cites(u.event.sources)}</p>
+        <ul>${u.changes.map((c) => `<li><strong>${esc(c.what)}</strong> : ${esc(c.after)} ${cites(c.sources)}</li>`).join("")}</ul>`,
+      )
+      .join("")}
+    <p class="no-print"><a href="#/mise-a-jour">Détail : avant / après, éléments affectés, actions →</a></p>
+  </div>`;
+}
+
 export function viewBrief(m: Memory): string {
   const gl = m.goLiveConditions
     .map((g) => {
@@ -27,6 +43,7 @@ export function viewBrief(m: Memory): string {
       <button class="no-print" onclick="window.print()">Imprimer / PDF</button>
     </div>
     <p class="muted">${esc(m.label)}</p>
+    ${updateBanner(m)}
     <dl class="brief-grid">
       ${m.brief.sections.map((s) => `<dt>${esc(s.theme)}</dt><dd>${esc(s.text)} ${cites(s.sources)}</dd>`).join("")}
     </dl>

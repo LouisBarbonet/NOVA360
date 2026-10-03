@@ -119,7 +119,8 @@ async function ingestEvent(body: { title: string; text?: string }) {
     purpose: "impact",
     rules: RULES,
     knowledge: `${memoryText("latest")}\n\n=== CORPUS COMPLET ===\n${corpusText()}`,
-    maxTokens: 12000,
+    maxTokens: 16000,
+    json: true,
     turns: [
       {
         role: "user",
@@ -131,7 +132,8 @@ Analyse :
 1. Qu'est-ce qui vient de changer? (avant/après, sourcé)
 2. Quelles informations précédentes sont affectées? (réponses Q01–Q10, conditions GL-1..3, actions, risques, contradictions, sujets)
 3. Quelles actions devraient être prises? (responsable, échéance connue ou « à confirmer », origine « engagement documenté » seulement si l'événement ou le corpus le prouve, sinon « recommandation équipe »)
-Contraintes : distingue le statut du problème, la décision antérieure et la nouvelle proposition. N'invente AUCUNE approbation. Ne ferme AUCUNE autre condition de go-live sans preuve explicite et liste-les dans "unchanged". Chaque élément doit citer ses sources (la nouvelle source ${fresh.map((s) => s.id).join(", ")} et les sources du corpus).
+Contraintes : distingue le statut du problème, la décision antérieure et la nouvelle proposition. N'invente AUCUNE approbation. Ne ferme AUCUNE autre condition de go-live sans preuve explicite et liste-les dans "unchanged".
+"patch" ne contient QUE les éléments réellement modifiés ou nouveaux (objets complets, même id) : n'y recopie jamais un élément inchangé. Vérifie chaque comparaison de dates (avant/après, nombre de jours) avant de l'écrire. Chaque élément doit citer ses sources (la nouvelle source ${fresh.map((s) => s.id).join(", ")} et les sources du corpus).
 
 Réponds UNIQUEMENT avec un objet JSON valide suivant ce schéma (sans texte autour) :
 ${IMPACT_SCHEMA}`,
@@ -139,14 +141,47 @@ ${IMPACT_SCHEMA}`,
     ],
   });
   const raw = out.text;
-  const json = raw.slice(raw.indexOf("{"), raw.lastIndexOf("}") + 1);
   let draft: unknown;
   try {
-    draft = JSON.parse(json);
+    draft = pruneUnchanged(parseLenient(raw) as Record<string, unknown>);
   } catch {
     draft = { version: nextVersion, _erreur: "Le modèle n'a pas produit de JSON valide : corrigez à la main.", brut: raw };
   }
-  return { sourceId: fresh.map((s) => s.id).join(", "), draft };
+  return { sourceId: fresh.map((s) => s.id).join(", "), provider: out.provider, model: out.model, draft };
+}
+
+/** JSON du LLM : texte autour ignoré, puis réparation des fautes courantes (clé sans guillemets, virgule finale). */
+export function parseLenient(raw: string): unknown {
+  const json = raw.slice(raw.indexOf("{"), raw.lastIndexOf("}") + 1);
+  try {
+    return JSON.parse(json);
+  } catch {
+    const repaired = json
+      .replace(/([{,]\s*)([A-Za-z_][\w-]*)\s*:/g, '$1"$2":')
+      .replace(/,(\s*[}\]])/g, "$1");
+    return JSON.parse(repaired);
+  }
+}
+
+/** Retire du patch les éléments identiques au baseline : seuls les vrais changements seront signalés « modifié ». */
+export function pruneUnchanged(draft: Record<string, unknown>): Record<string, unknown> {
+  const baseline = JSON.parse(readFileSync(join(MEMORY, "baseline.json"), "utf8")) as Record<string, unknown>;
+  const patch = (draft.patch ?? {}) as Record<string, unknown>;
+  const same = (a: Record<string, unknown>, b: Record<string, unknown>) =>
+    Object.keys(a).every((k) => k.startsWith("_") || JSON.stringify(a[k]) === JSON.stringify(b[k]));
+  const pruned: string[] = [];
+  for (const [key, items] of Object.entries(patch)) {
+    const base = baseline[key];
+    if (key === "timeline" || !Array.isArray(items) || !Array.isArray(base)) continue;
+    patch[key] = items.filter((it: Record<string, unknown>) => {
+      const k = it.id ?? it.title;
+      const b = (base as Record<string, unknown>[]).find((x) => (x.id ?? x.title) === k);
+      const unchanged = !!b && same(it, b);
+      if (unchanged) pruned.push(String(k));
+      return !unchanged;
+    });
+  }
+  return { ...draft, patch, ...(pruned.length ? { _retiresCarInchanges: pruned } : {}) };
 }
 
 function saveUpdate(raw: string) {

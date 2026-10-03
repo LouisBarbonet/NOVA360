@@ -39,7 +39,8 @@ export function applyUpdates(base: Memory, list: Update[], version: string): Mem
       timeline: [...mem.timeline, ...(p.timeline ?? []).map((t) => ({ ...t, _new: u.version }))].sort((a, b) =>
         a.date.localeCompare(b.date),
       ),
-      brief: p.brief ?? mem.brief,
+      // Sans brief réécrit, le titre indique la version ; l'encadré des changements complète le contenu
+      brief: p.brief ?? { ...mem.brief, title: `Brief de reprise — NOVA, état après ${u.version} (${u.asOf.slice(0, 10)})` },
     };
     if (u.version === version) break;
   }

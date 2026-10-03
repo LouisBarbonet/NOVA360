@@ -1,0 +1,539 @@
+{
+  "version": "U1",
+  "label": "U1 — Courriel de Boréal du 1er oct. 2026 (build 2026.09.30, ACC-303 livré, runbook repoussé au 14 oct., proposition de report au 29 oct.)",
+  "asOf": "2026-10-01T10:12:00-04:00",
+  "event": {
+    "title": "Courriel de Julien Moreau (Boréal) du 1er octobre 2026",
+    "summary": "1) ACC-303 : correctif livré en validation via la build 2026.09.30 (non encore validé par Mélissa). 2) Runbook / exploitation : version finale repoussée au 14 octobre par l'équipe ops de Boréal. 3) Date de mise en production : proposition de Boréal de reporter du 22 au 29 octobre en raison du délai sur le runbook. Statut : c'est une proposition du fournisseur (aucune décision de gouvernance prise à cette date).",
+    "sources": [
+      {
+        "s": "EVT-01_REPETITION_Courriel_Boreal_1er_octobre",
+        "r": "L7-L15"
+      }
+    ]
+  },
+  "changes": [
+    {
+      "what": "ACC-303 (accessibilité)",
+      "before": "Ouvert, correctif annoncé pour la prochaine build sans date (M06 L15, ACC-303 L16)",
+      "after": "Correctif livré en validation via la build 2026.09.30 ce matin ; en attente du re-test de Mélissa pour fermeture",
+      "sources": [
+        {
+          "s": "EVT-01_REPETITION_Courriel_Boreal_1er_octobre",
+          "r": "L9"
+        },
+        {
+          "s": "ACC-303",
+          "r": "L16"
+        }
+      ]
+    },
+    {
+      "what": "Runbook (GL-3 / OPS-601)",
+      "before": "Incomplet, retour arrière TODO, pas de version finale reçue au 29 sept. (OPS-601 L14-L16)",
+      "after": "Version finale repoussée au 14 octobre 2026 par Boréal pour rédiger la procédure de retour arrière exécutable",
+      "sources": [
+        {
+          "s": "EVT-01_REPETITION_Courriel_Boreal_1er_octobre",
+          "r": "L11"
+        },
+        {
+          "s": "OPS-601",
+          "r": "L14-L16"
+        }
+      ]
+    },
+    {
+      "what": "Date de mise en production",
+      "before": "Cible approuvée au 22 octobre 2026, conditionnelle à 3 éléments (M04 L17-L23, M06 L11-L16)",
+      "after": "Nouvelle proposition de Boréal (1er oct.) de reporter au 29 octobre 2026 ; la décision formelle de gouvernance reste à prendre par le client",
+      "sources": [
+        {
+          "s": "EVT-01_REPETITION_Courriel_Boreal_1er_octobre",
+          "r": "L13"
+        },
+        {
+          "s": "M06",
+          "r": "L16"
+        }
+      ]
+    }
+  ],
+  "affected": [
+    {
+      "ref": "topic:date",
+      "impact": "Proposition de report au 29 oct. par Boréal suite au retard sur le runbook (prévu le 14 oct.). La date approuvée reste le 22 oct. tant que le comité n'a pas tranché.",
+      "sources": [
+        {
+          "s": "EVT-01_REPETITION_Courriel_Boreal_1er_octobre",
+          "r": "L13"
+        },
+        {
+          "s": "M06",
+          "r": "L16"
+        }
+      ]
+    },
+    {
+      "ref": "topic:accessibilite",
+      "impact": "ACC-303 : correctif livré (build 2026.09.30), en attente du re-test de Mélissa.",
+      "sources": [
+        {
+          "s": "EVT-01_REPETITION_Courriel_Boreal_1er_octobre",
+          "r": "L9"
+        }
+      ]
+    },
+    {
+      "ref": "topic:runbook",
+      "impact": "OPS-601 / GL-3 : version finale du runbook reportée au 14 octobre par Boréal, créant un risque de dépassement de la cible du 22 oct. et de la fin du contrat (31 oct.).",
+      "sources": [
+        {
+          "s": "EVT-01_REPETITION_Courriel_Boreal_1er_octobre",
+          "r": "L11"
+        },
+        {
+          "s": "CONTRAT_Boreal_NOVA",
+          "r": "p.1"
+        }
+      ]
+    },
+    {
+      "ref": "GL-2",
+      "impact": "Correctif ACC-303 livré en validation (build 2026.09.30). Condition non fermée tant que Mélissa n'a pas re-testé et validé.",
+      "sources": [
+        {
+          "s": "EVT-01_REPETITION_Courriel_Boreal_1er_octobre",
+          "r": "L9"
+        },
+        {
+          "s": "M06",
+          "r": "L11"
+        }
+      ]
+    },
+    {
+      "ref": "GL-3",
+      "impact": "Version finale du runbook (incluant rollback) repoussée au 14 octobre par Boréal. Bloque le go exploitation d'Olivier et menace la cible du 22 octobre.",
+      "sources": [
+        {
+          "s": "EVT-01_REPETITION_Courriel_Boreal_1er_octobre",
+          "r": "L11"
+        },
+        {
+          "s": "M06",
+          "r": "L10-L11"
+        }
+      ]
+    },
+    {
+      "ref": "Q01",
+      "impact": "La date approuvée demeure le 22 octobre 2026 (conditionnelle), mais Boréal propose un report au 29 octobre suite au retard du runbook annoncé pour le 14 octobre.",
+      "sources": [
+        {
+          "s": "EVT-01_REPETITION_Courriel_Boreal_1er_octobre",
+          "r": "L11-L13"
+        },
+        {
+          "s": "M06",
+          "r": "L16"
+        }
+      ]
+    },
+    {
+      "ref": "Q09",
+      "impact": "Le correctif ACC-303 a été livré dans la build 2026.09.30 (1er oct.) et n'attend plus que le re-test de Mélissa.",
+      "sources": [
+        {
+          "s": "EVT-01_REPETITION_Courriel_Boreal_1er_octobre",
+          "r": "L9"
+        }
+      ]
+    },
+    {
+      "ref": "Q10",
+      "impact": "Mise à jour de l'échéance du runbook : version finale promise par Boréal pour le 14 octobre (au lieu de « quelques jours avant » sans date fixe).",
+      "sources": [
+        {
+          "s": "EVT-01_REPETITION_Courriel_Boreal_1er_octobre",
+          "r": "L11"
+        }
+      ]
+    },
+    {
+      "ref": "A-02",
+      "impact": "Correctif ACC-303 livré dans la build 2026.09.30 ; action passée à « livré en validation ».",
+      "sources": [
+        {
+          "s": "EVT-01_REPETITION_Courriel_Boreal_1er_octobre",
+          "r": "L9"
+        }
+      ]
+    },
+    {
+      "ref": "A-03",
+      "impact": "Mélissa peut désormais effectuer son re-test clavier sur ACC-303 (build 2026.09.30).",
+      "sources": [
+        {
+          "s": "EVT-01_REPETITION_Courriel_Boreal_1er_octobre",
+          "r": "L9"
+        }
+      ]
+    },
+    {
+      "ref": "A-04",
+      "impact": "Échéance fixée au 14 octobre 2026 par Boréal pour la livraison de la version finale du runbook (incluant le rollback).",
+      "sources": [
+        {
+          "s": "EVT-01_REPETITION_Courriel_Boreal_1er_octobre",
+          "r": "L11"
+        }
+      ]
+    },
+    {
+      "ref": "RK-1",
+      "impact": "Le risque go-live est accru : le runbook est repoussé au 14 octobre, ce qui entre en collision directe avec la cible du 22 octobre (et laisse seulement 17 jours avant la fin du contrat le 31 oct.).",
+      "sources": [
+        {
+          "s": "EVT-01_REPETITION_Courriel_Boreal_1er_octobre",
+          "r": "L11-L13"
+        },
+        {
+          "s": "CONTRAT_Boreal_NOVA",
+          "r": "p.1"
+        }
+      ]
+    },
+    {
+      "ref": "RK-2",
+      "impact": "Exploitation : la procédure de retour arrière est repoussée au 14 octobre, maintenant le blocage du go exploitation.",
+      "sources": [
+        {
+          "s": "EVT-01_REPETITION_Courriel_Boreal_1er_octobre",
+          "r": "L11"
+        }
+      ]
+    },
+    {
+      "ref": "RK-4",
+      "impact": "Marge contractuelle critique : si le runbook n'arrive que le 14 oct., toute la phase de stabilisation et de mise en production (22 ou 29 oct.) se rapproche dangereusement de la fin du contrat (31 oct.).",
+      "sources": [
+        {
+          "s": "EVT-01_REPETITION_Courriel_Boreal_1er_octobre",
+          "r": "L11-L13"
+        },
+        {
+          "s": "CONTRAT_Boreal_NOVA",
+          "r": "p.1"
+        }
+      ]
+    }
+  ],
+  "unchanged": [
+    {
+      "ref": "GL-1",
+      "why": "Aucune nouvelle information dans l'événement concernant SEC-210 ou son re-test par Sophie.",
+      "sources": [
+        {
+          "s": "EVT-01_REPETITION_Courriel_Boreal_1er_octobre",
+          "r": "L1-L15"
+        }
+      ]
+    },
+    {
+      "ref": "budget / factures",
+      "why": "L'événement ne traite pas des finances ni d'INV-003.",
+      "sources": [
+        {
+          "s": "EVT-01_REPETITION_Courriel_Boreal_1er_octobre",
+          "r": "L1-L15"
+        }
+      ]
+    }
+  ],
+  "patch": {
+    "topics": [
+      {
+        "id": "date",
+        "title": "Date de mise en production",
+        "level": "warn",
+        "status": "22 oct. 2026 approuvée (proposition Boréal au 29 oct. reçue)",
+        "summary": "Le comité a approuvé le 22 octobre (10 sept.). Boréal propose le 1er oct. de reporter au 29 octobre en raison de la livraison du runbook repoussée au 14 octobre. Décision de gouvernance en attente.",
+        "sources": [
+          {
+            "s": "M04",
+            "r": "L17-L23"
+          },
+          {
+            "s": "EVT-01_REPETITION_Courriel_Boreal_1er_octobre",
+            "r": "L11-L13"
+          }
+        ]
+      },
+      {
+        "id": "accessibilite",
+        "title": "Accessibilité",
+        "level": "warn",
+        "status": "ACC-303 correctif livré (build 2026.09.30) — en validation",
+        "summary": "ACC-301 et ACC-302 fermés. ACC-303 (modale clavier) : correctif livré dans la build 2026.09.30 du 1er oct. ; en attente du re-test de Mélissa.",
+        "sources": [
+          {
+            "s": "ACC-303",
+            "r": "L16"
+          },
+          {
+            "s": "EVT-01_REPETITION_Courriel_Boreal_1er_octobre",
+            "r": "L9"
+          }
+        ]
+      },
+      {
+        "id": "runbook",
+        "title": "Exploitation — runbook (OPS-601)",
+        "level": "bad",
+        "status": "Version finale repoussée au 14 octobre par Boréal",
+        "summary": "Boréal a indiqué le 1er oct. que la version finale du runbook (incluant le rollback) est prévue pour le 14 octobre. Olivier Côté ne donnera pas son go exploitation avant d'avoir reçu et validé cette procédure.",
+        "sources": [
+          {
+            "s": "OPS-601",
+            "r": "L14-L16"
+          },
+          {
+            "s": "EVT-01_REPETITION_Courriel_Boreal_1er_octobre",
+            "r": "L11"
+          }
+        ]
+      }
+    ],
+    "goLiveConditions": [
+      {
+        "id": "GL-2",
+        "title": "Fermeture d'ACC-303 (focus clavier dans la modale)",
+        "_comment": "Modifié : correctif livré dans build 2026.09.30",
+        "approver": "Mélissa Gagnon (accessibilité)",
+        "status": "Correctif livré dans la build 2026.09.30 (1er oct.) — en attente du re-test de Mélissa",
+        "level": "warn",
+        "actions": [
+          "A-02",
+          "A-03"
+        ],
+        "sources": [
+          {
+            "s": "M06",
+            "r": "L11"
+          },
+          {
+            "s": "EVT-01_REPETITION_Courriel_Boreal_1er_octobre",
+            "r": "L9"
+          }
+        ]
+      },
+      {
+        "id": "GL-3",
+        "title": "Approbation du runbook, incluant le retour arrière",
+        "_comment": "Modifié : échéance runbook repoussée au 14 oct.",
+        "approver": "Olivier Côté (exploitation)",
+        "status": "OUVERT ; version finale promise par Boréal pour le 14 octobre 2026",
+        "level": "bad",
+        "actions": [
+          "A-04",
+          "A-05"
+        ],
+        "sources": [
+          {
+            "s": "M06",
+            "r": "L10-L11"
+          },
+          {
+            "s": "EVT-01_REPETITION_Courriel_Boreal_1er_octobre",
+            "r": "L11"
+          }
+        ]
+      }
+    ],
+    "actions": [
+      {
+        "id": "A-02",
+        "title": "Livrer le correctif ACC-303 dans la prochaine build",
+        "owner": "Boréal (Julien Moreau)",
+        "ownerStatus": "confirmé",
+        "due": "2026-09-30 (build déployée le 1er oct.)",
+        "origin": "engagement documenté",
+        "condition": "GL-2",
+        "status": "réalisé (livré en validation)",
+        "sources": [
+          {
+            "s": "EVT-01_REPETITION_Courriel_Boreal_1er_octobre",
+            "r": "L9"
+          }
+        ]
+      },
+      {
+        "id": "A-03",
+        "title": "Re-tester ACC-303 au clavier (Chrome et Edge) et fermer le ticket si c'est conforme",
+        "owner": "Mélissa Gagnon",
+        "ownerStatus": "proposé",
+        "due": "à confirmer (suite à la build du 30 sept.)",
+        "origin": "recommandation équipe",
+        "condition": "GL-2",
+        "status": "à faire (en cours)",
+        "sources": [
+          {
+            "s": "ACC-303",
+            "r": "L14"
+          },
+          {
+            "s": "EVT-01_REPETITION_Courriel_Boreal_1er_octobre",
+            "r": "L9"
+          }
+        ]
+      },
+      {
+        "id": "A-04",
+        "title": "Compléter le runbook : étape 4 (retour arrière) et étape 5 (validation fonctionnelle post-déploiement)",
+        "owner": "Boréal (équipe ops, relancée par Julien Moreau)",
+        "ownerStatus": "confirmé",
+        "due": "2026-10-14",
+        "origin": "engagement documenté",
+        "condition": "GL-3",
+        "status": "en cours (échéance reportée au 14 oct.)",
+        "sources": [
+          {
+            "s": "EVT-01_REPETITION_Courriel_Boreal_1er_octobre",
+            "r": "L11"
+          }
+        ]
+      },
+      {
+        "id": "A-14",
+        "title": "Trancher formellement sur la proposition de report au 29 octobre (comité de direction ou arbitrage Nicolas/comité)",
+        "owner": "Nicolas Perron / Comité de direction",
+        "ownerStatus": "proposé",
+        "due": "avant le 22 octobre 2026",
+        "origin": "recommandation équipe",
+        "condition": "GL-3",
+        "status": "à faire",
+        "sources": [
+          {
+            "s": "EVT-01_REPETITION_Courriel_Boreal_1er_octobre",
+            "r": "L13"
+          }
+        ]
+      }
+    ],
+    "risks": [
+      {
+        "id": "RK-1",
+        "rank": 1,
+        "title": "Le runbook est reporté au 14 oct., menaçant directement la cible du 22 oct. et la fin du contrat (31 oct.)",
+        "level": "élevé",
+        "why": "SEC-210 n'est pas accepté, ACC-303 est en validation, et le runbook complet n'est attendu que le 14 oct. (laissant seulement 8 jours avant le 22 oct. et 17 jours avant la fin du contrat le 31 oct.).",
+        "mitigation": "A-01, A-03, A-04, A-05, A-13, A-14",
+        "sources": [
+          {
+            "s": "EVT-01_REPETITION_Courriel_Boreal_1er_octobre",
+            "r": "L11-L13"
+          },
+          {
+            "s": "CONTRAT_Boreal_NOVA",
+            "r": "p.1"
+          }
+        ]
+      }
+    ],
+    "missing": [
+      {
+        "title": "Décision de gouvernance sur la proposition de report au 29 oct.",
+        "detail": "Boréal a proposé le 29 oct. (EVT-01), mais aucune décision de comité n'a encore été prise.",
+        "sources": [
+          {
+            "s": "EVT-01_REPETITION_Courriel_Boreal_1er_octobre",
+            "r": "L13"
+          }
+        ]
+      }
+    ],
+    "decisions": [],
+    "contradictions": [],
+    "timeline": [
+      {
+        "date": "2026-10-01",
+        "type": "proposition",
+        "topic": "date",
+        "title": "Boréal PROPOSE de reporter la mise en production du 22 au 29 octobre suite au délai sur le runbook (prévu le 14 oct.)",
+        "sources": [
+          {
+            "s": "EVT-01_REPETITION_Courriel_Boreal_1er_octobre",
+            "r": "L11-L13"
+          }
+        ]
+      },
+      {
+        "date": "2026-10-01",
+        "type": "livraison",
+        "topic": "accessibilite",
+        "title": "Boréal livre le correctif ACC-303 en validation (build 2026.09.30)",
+        "sources": [
+          {
+            "s": "EVT-01_REPETITION_Courriel_Boreal_1er_octobre",
+            "r": "L9"
+          }
+        ]
+      }
+    ],
+    "answers": [
+      {
+        "id": "Q01",
+        "question": "Quelle est la date de mise en production actuellement approuvée, et avec quelle réserve?",
+        "short": "Le 22 octobre 2026 (approuvée). Proposition de Boréal au 29 octobre reçue le 1er oct.",
+        "detail": "Le comité a approuvé le 22 octobre le 10 sept. (M04 L17-L23), sous réserve de trois conditions (M06 L11-L16). Le 1er octobre, Boréal a proposé de reporter au 29 octobre en raison de la livraison du runbook repoussée au 14 octobre (EVT-01 L11-L13). Cette proposition n'est pas encore une décision approuvée.",
+        "sources": [
+          {
+            "s": "M04",
+            "r": "L17-L23"
+          },
+          {
+            "s": "EVT-01_REPETITION_Courriel_Boreal_1er_octobre",
+            "r": "L11-L13"
+          }
+        ]
+      },
+      {
+        "id": "Q09",
+        "question": "L'accessibilité est-elle complétée? Identifiez ce qui reste à corriger.",
+        "short": "Non. ACC-301 et 302 fermés. ACC-303 (modale) : correctif livré le 1er oct. (build 2026.09.30), en attente du re-test de Mélissa.",
+        "detail": "ACC-301 et 302 fermés en août (ACC-301 L16, ACC-302 L16). ACC-303 (focus clavier dans la modale) était ouvert ; Boréal a livré le correctif dans la build 2026.09.30 déployée le 1er octobre (EVT-01 L9). Le ticket reste ouvert tant que Mélissa n'a pas validé.",
+        "sources": [
+          {
+            "s": "ACC-303",
+            "r": "L16"
+          },
+          {
+            "s": "EVT-01_REPETITION_Courriel_Boreal_1er_octobre",
+            "r": "L9"
+          }
+        ]
+      },
+      {
+        "id": "Q10",
+        "question": "Quelles sont les trois conditions de go-live? Précisez les travaux manquants du runbook à partir de sa capture.",
+        "short": "(1) Sécurité SEC-210, (2) Accessibilité ACC-303 (correctif livré le 1er oct., en validation), (3) Runbook complet (version finale promise le 14 oct. par Boréal).",
+        "detail": "Conditions fixées le 26 sept. (M06 L11-L14). SEC-210 en validation. ACC-303 : correctif livré le 1er oct. (build 2026.09.30), re-test en attente (EVT-01 L9). Runbook (OPS-601) : étape 4 (rollback) et étape 5 à compléter ; Boréal a indiqué le 1er oct. que la version finale sera prête le 14 oct. (EVT-01 L11).",
+        "sources": [
+          {
+            "s": "M06",
+            "r": "L11-L14"
+          },
+          {
+            "s": "OPS-601_runbook",
+            "r": "capture"
+          },
+          {
+            "s": "EVT-01_REPETITION_Courriel_Boreal_1er_octobre",
+            "r": "L9-L11"
+          }
+        ]
+      }
+    ]
+  }
+}

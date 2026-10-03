@@ -31,10 +31,23 @@ const quote = (c: Cite) => {
 const cell = (t: string) => t.replace(/\|/g, "\\|").replace(/\n/g, " ");
 
 function brief(m: Memory): string {
+  const applied = m.version === "baseline" ? [] : updates.slice(0, updates.findIndex((u) => u.version === m.version) + 1);
+  const banner = applied.length
+    ? [
+        "",
+        "> **Changements depuis le baseline du 30 sept.** (le reste du brief est inchangé)",
+        ...applied.flatMap((u) => [
+          ">",
+          `> **${u.version} — ${u.event.title}** (${refs(u.event.sources)})`,
+          ...u.changes.map((c) => `> - **${c.what}** : ${c.after} — ${refs(c.sources)}`),
+        ]),
+        "",
+      ].join("\n")
+    : "";
   return `# ${m.brief.title}
 
 *${m.label}*
-
+${banner}
 ${m.brief.sections.map((s) => `**${s.theme}.** ${s.text} — preuves : ${refs(s.sources)}`).join("\n\n")}
 
 ## Conditions de go-live → actions
