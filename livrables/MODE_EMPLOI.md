@@ -7,11 +7,14 @@ Mémoire opérationnelle du projet NOVA, établie à partir des 64 fichiers du c
 - **Sans installation (jury)** : ouvrir `dist/index.html` dans un navigateur. Tout fonctionne hors ligne : brief, Q01–Q10, chronologie, décisions, contradictions, actions, finances, sources, recherche et mises à jour. Seul le chat demande le mode développement.
 - **Mode complet (démo)** : `npm install`, copier `.env.example` en `.env` et y mettre une clé API Anthropic, puis `npm run dev` et ouvrir http://localhost:5173.
 
+- **Livrables hors application** : `livrables/<version>/` contient le brief (Markdown + PDF d'une page), les réponses Q01–Q10 avec extraits, la mémoire et le dossier de décisions. On les régénère avec `npm run export`.
+
 ## Naviguer
 
 - **Brief de reprise** : une page imprimable avec responsable, date et conditions, portée, budget, factures et priorités. Les trois conditions de go-live y sont reliées à leurs actions, responsables et échéances.
 - **Q01–Q10** : réponse courte, puis détail et nuances. Chaque réponse cite des preuves.
 - **Preuves** : chaque étiquette bleue (ex. `M04 L17-L23`) ouvre le fichier source avec le passage **surligné**. Les repères possibles sont une ligne (L), une page PDF (p.), une cellule Excel (`Plan projet!E7`) ou une capture.
+- **Dossier de décisions** : pour chaque décision, qui l'a proposée et qui l'a prise, pourquoi, puis la chaîne des faits avec l'extrait exact de chaque preuve.
 - **Chronologie** : filtrable par type (proposition, décision, livraison, validation, risque, fait) et par sujet.
 - **Contradictions** : chaque conflit est tranché par l'autorité de la source ou la date des faits.
 - **Actions et risques** : filtre « engagement documenté » ou « recommandation de notre équipe » ; liste des informations manquantes.
