@@ -8,6 +8,6 @@ export default defineConfig(({ mode }) => {
   return {
     base: "./",
     plugins: [novaApi(), viteSingleFile()],
-    server: { watch: { ignored: ["**/NOVA_ETUDIANTS/**"] } },
+    server: { watch: { ignored: ["**/NOVA_ETUDIANTS/**", "**/.cache/**"] } },
   };
 });

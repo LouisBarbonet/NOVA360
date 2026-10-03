@@ -75,8 +75,9 @@ async function chat(body: { version?: string; messages: { role: "user" | "assist
     // la consigne de date est fusionnée dans le dernier message utilisateur
     turns: [...body.messages.slice(-10), { role: "user", content: `(${asOf})` }],
     maxTokens: 2000,
+    cache: true,
   });
-  return { answer: out.text, provider: out.provider, model: out.model };
+  return { answer: out.text, provider: out.provider, model: out.model, cached: !!out.cached };
 }
 
 const IMPACT_SCHEMA = `{

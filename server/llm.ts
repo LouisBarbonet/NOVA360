@@ -2,14 +2,27 @@
 // Choix par .env : NOVA_PROVIDER=claude|gemini (défaut claude).
 import Anthropic from "@anthropic-ai/sdk";
 import { ApiError, GoogleGenAI } from "@google/genai";
+import { existsSync, readFileSync } from "node:fs";
+import { cacheKey, readCache, writeCache } from "./cache";
 
 export type Turn = { role: "user" | "assistant"; content: string };
 type Purpose = "chat" | "impact";
-export type Completion = { text: string; provider: string; model: string };
+export type Completion = { text: string; provider: string; model: string; cached?: boolean };
 
 const httpError = (message: string, status: number) => Object.assign(new Error(message), { status });
 
-// Lus à l'appel : le .env est chargé par vite.config.ts après l'import de ce module
+/** Relit .env à chaque appel : changer de modèle ou de fournisseur ne demande pas de redémarrer le serveur. */
+// (loadEnv de Vite ne convient pas ici : il donne priorité aux valeurs déjà en mémoire, donc aux anciennes)
+function refreshEnv() {
+  for (const file of [".env", ".env.local"]) {
+    if (!existsSync(file)) continue;
+    for (const line of readFileSync(file, "utf8").split(/\r?\n/)) {
+      const m = line.match(/^\s*([A-Z0-9_]+)\s*=\s*(.*?)\s*$/);
+      if (m) process.env[m[1]] = m[2].replace(/^(["'])(.*)\1$/, "$2");
+    }
+  }
+}
+
 export const provider = () => ((process.env.NOVA_PROVIDER || "claude").toLowerCase() === "gemini" ? "gemini" : "claude");
 
 function modelFor(purpose: Purpose): string {
@@ -23,10 +36,11 @@ function modelFor(purpose: Purpose): string {
 
 /** Échoue avant tout effet de bord si la clé du fournisseur choisi manque. */
 export function assertConfigured() {
+  refreshEnv();
   if (provider() === "gemini") {
-    if (!process.env.GEMINI_API_KEY) throw httpError("Aucune clé Gemini : définissez GEMINI_API_KEY dans le fichier .env (ou NOVA_PROVIDER=claude), puis relancez npm run dev.", 503);
+    if (!process.env.GEMINI_API_KEY) throw httpError("Aucune clé Gemini : définissez GEMINI_API_KEY dans le fichier .env (ou NOVA_PROVIDER=claude).", 503);
   } else if (!process.env.ANTHROPIC_API_KEY && !process.env.ANTHROPIC_AUTH_TOKEN) {
-    throw httpError("Aucune clé API : définissez ANTHROPIC_API_KEY dans le fichier .env (ou NOVA_PROVIDER=gemini avec GEMINI_API_KEY), puis relancez npm run dev.", 503);
+    throw httpError("Aucune clé API : définissez ANTHROPIC_API_KEY dans le fichier .env (ou NOVA_PROVIDER=gemini avec GEMINI_API_KEY).", 503);
   }
 }
 
@@ -44,11 +58,30 @@ function alternate(turns: Turn[]): Turn[] {
  * @param rules consignes courtes
  * @param knowledge bloc volumineux et stable (mémoire + corpus), mis en cache côté Claude
  */
-export async function complete(opts: { purpose: Purpose; rules: string; knowledge: string; turns: Turn[]; maxTokens: number; json?: boolean }): Promise<Completion> {
+export async function complete(opts: {
+  purpose: Purpose;
+  rules: string;
+  knowledge: string;
+  turns: Turn[];
+  maxTokens: number;
+  json?: boolean;
+  /** Réutilise une réponse identique déjà obtenue (même mémoire, même modèle, même conversation). */
+  cache?: boolean;
+}): Promise<Completion> {
   assertConfigured();
   const model = modelFor(opts.purpose);
   const turns = alternate(opts.turns);
-  return provider() === "gemini" ? gemini(model, opts, turns) : claude(model, opts, turns);
+  const key = opts.cache
+    ? cacheKey({ provider: provider(), model, purpose: opts.purpose, rules: opts.rules, knowledge: opts.knowledge, turns, maxTokens: opts.maxTokens, json: opts.json })
+    : "";
+  if (key) {
+    const hit = readCache<Completion>(key);
+    if (hit) return { ...hit, cached: true };
+  }
+  const out = provider() === "gemini" ? await gemini(model, opts, turns) : await claude(model, opts, turns);
+  // Seules les réponses réussies sont mises en cache (jamais une erreur de quota ou de surcharge)
+  if (key) writeCache(key, out, turns[turns.length - 1]?.content ?? "");
+  return out;
 }
 
 async function claude(model: string, opts: { rules: string; knowledge: string; maxTokens: number }, turns: Turn[]): Promise<Completion> {

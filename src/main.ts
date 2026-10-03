@@ -90,6 +90,8 @@ function bind(route: string) {
 // ───────────── Chat ─────────────
 type Turn = { role: "user" | "assistant"; content: string };
 const history: Turn[] = [];
+// Réponses servies depuis le cache serveur (aucun quota consommé), par index dans l'historique
+const fromCache = new Set<number>();
 
 function bindChat() {
   const log = document.getElementById("chat-log")!;
@@ -97,7 +99,7 @@ function bindChat() {
   const input = form.querySelector("input")!;
   const paint = () => {
     log.innerHTML = history
-      .map((t) => `<div class="msg msg-${t.role}">${t.role === "user" ? esc(t.content) : linkifyCitations(t.content)}</div>`)
+      .map((t, i) => `<div class="msg msg-${t.role}">${t.role === "user" ? esc(t.content) : linkifyCitations(t.content)}${fromCache.has(i) ? `<div class="cache-tag">⚡ réponse en cache : aucun quota consommé</div>` : ""}</div>`)
       .join("");
     log.scrollTop = log.scrollHeight;
   };
@@ -115,6 +117,7 @@ function bindChat() {
       });
       const data = await res.json();
       history[history.length - 1].content = res.ok ? data.answer : `⚠ ${data.error ?? res.statusText}`;
+      if (res.ok && data.cached) fromCache.add(history.length - 1);
     } catch {
       history[history.length - 1].content =
         "⚠ Chat indisponible dans cet export statique (il nécessite `npm run dev` et une clé API). Utilisez les pages Questions, Recherche et Sources, qui fonctionnent hors ligne.";

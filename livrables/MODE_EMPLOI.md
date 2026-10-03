@@ -8,6 +8,8 @@ Mémoire opérationnelle du projet NOVA, établie à partir des 64 fichiers du c
 - **Mode complet (démo)** : `npm install`, copier `.env.example` en `.env` et y mettre une clé API, puis `npm run dev` et ouvrir http://localhost:5173.
   - **Claude (par défaut)** : `ANTHROPIC_API_KEY` (console.anthropic.com, crédits prépayés).
   - **Gemini (secours gratuit)** : `NOVA_PROVIDER=gemini` et `GEMINI_API_KEY` (aistudio.google.com). Les quotas gratuits sont bas : l'app affiche un message clair quand ils sont atteints. `npm run gemini:models` liste les modèles disponibles pour `GEMINI_MODEL`.
+  - Le `.env` est relu à chaque question : on peut changer de modèle ou de fournisseur sans redémarrer.
+  - **Cache des réponses** : une question identique (casse, espaces et ponctuation ignorés), posée sur la même version de la mémoire, est servie depuis `.cache/llm/` sans consommer de quota (indicateur ⚡ dans le chat). Une mise à jour de la mémoire invalide le cache. `npm run cache:clear` le vide. Les analyses d'impact ne sont pas mises en cache, pour pouvoir relancer un brouillon.
 
 - **Livrables hors application** : `livrables/<version>/` contient le brief (Markdown + PDF d'une page), les réponses Q01–Q10 avec extraits, la mémoire et le dossier de décisions. On les régénère avec `npm run export` ; `npm run package` refait en plus le zip de remise `NOVA360_remise.zip`.
 
