@@ -70,3 +70,10 @@ export type Update = {
     brief?: Memory["brief"];
   };
 };
+
+/** Réponses du chat générées à l'avance (scripts/precompute.ts), servies sans appel réseau. */
+export type Precomputed = {
+  generatedAt: string;
+  provider: string;
+  entries: { version: string; question: string; answer: string; model: string }[];
+};

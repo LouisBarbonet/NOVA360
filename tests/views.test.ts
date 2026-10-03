@@ -95,3 +95,25 @@ describe("variantes de citations des LLM", () => {
     expect(html).toContain("[note:importante]");
   });
 });
+
+describe("réponses pré-enregistrées du chat", () => {
+  it("toutes leurs citations pointent vers un passage réel du corpus", async () => {
+    const files = import.meta.glob("../data/precomputed/*.json", { eager: true, import: "default" }) as Record<string, { entries: { question: string; answer: string }[] }>;
+    const { linkifyCitations } = await import("../src/ui");
+    for (const f of Object.values(files)) {
+      for (const e of f.entries) {
+        const html = linkifyCitations(e.answer);
+        expect(html, `citation invalide dans : ${e.question}`).not.toContain("cite-broken");
+      }
+    }
+  });
+});
+
+describe("plages de cellules Excel", () => {
+  it("résout « Risques!F2-H2 » sur la ligne 2 du registre", async () => {
+    const { refMatches } = await import("../src/evidence");
+    expect(refMatches("Risques!ligne 2", "Risques!F2-H2")).toBe(true);
+    expect(refMatches("Risques!ligne 3", "Risques!F2-H2")).toBe(false);
+    expect(refMatches("Risques!ligne 4", "Risques!A2-H5")).toBe(true);
+  });
+});

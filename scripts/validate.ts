@@ -18,6 +18,14 @@ export function resolveRef(src: Src, ref: string): boolean {
     return has(range[1]) && (!range[2] || has(range[2]));
   }
   // Cellule Excel : « Feuille!E7 » → la ligne 7 de la feuille contient « E7= »
+  // Plage de cellules : « Risques!F2-H2 » → au moins une ligne de la plage existe
+  const span = ref.match(/^(.+)!([A-Z]+)(\d+)-([A-Z]+)?(\d+)$/);
+  if (span) {
+    return src.segments.some((g) => {
+      const row = g.ref.match(/^(.+)!ligne (\d+)$/);
+      return !!row && row[1] === span[1] && Number(row[2]) >= Number(span[3]) && Number(row[2]) <= Number(span[5]);
+    });
+  }
   const cell = ref.match(/^(.+)!([A-Z]+)(\d+)$/);
   if (cell) {
     return src.segments.some((g) => g.ref === `${cell[1]}!ligne ${cell[3]}` && g.text.includes(`${cell[2]}${cell[3]}=`));

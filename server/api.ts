@@ -5,6 +5,7 @@ import { readFileSync, readdirSync, writeFileSync, mkdirSync, existsSync } from 
 import { join } from "node:path";
 import { execFileSync } from "node:child_process";
 import { assertConfigured, complete } from "./llm";
+import { RULES, chatTurns, corpusText as buildCorpusText, knowledge, memoryText as buildMemoryText } from "./prompt";
 
 const CORPUS = "data/corpus.json";
 const MEMORY = "data/memory";
@@ -13,26 +14,7 @@ const EVENT_DIR = "NOVA_ETUDIANTS/Projet360_NOVA_ETUDIANTS/09_Nouvel_evenement";
 type Seg = { ref: string; text: string };
 type Src = { id: string; path: string; folder: string; segments: Seg[]; attachments: { filename: string; duplicateOf?: string }[] };
 
-const RULES = `Tu es la mémoire opérationnelle du projet NOVA (projet fictif). Tu réponds en français, de façon concise et nuancée.
-Règles impératives :
-- N'utilise QUE les faits du corpus et de la mémoire fournis. Si une information manque, dis-le explicitement (« non documenté »). N'invente ni décision, ni échéance, ni approbation.
-- Cite chaque fait avec le marqueur [[ID:repère]] où ID est l'identifiant de source (ex. E05, M04, SEC-210, Plan_Projet_NOVA_v3_12sept) et repère est L<n> ou L<a>-L<b> (lignes), p.<n> (page PDF), Feuille!<cellule> (Excel, ex. Plan projet!E7) ou « capture » (image). Exemple : [[M04:L17-L23]]. Un seul repère par marqueur : pour deux preuves, écris [[SEC-210:L25]] [[M06:L7]] (jamais [[A:x], [B:y]] ni [[ACC-303:L6,L14]]).
-- Distingue toujours proposition / décision / livraison / validation. Un correctif « livré » ou « déployé » n'est pas « accepté ». Une proposition n'est pas une décision.
-- Une date de fichier récente ne garantit pas l'exactitude : tranche par l'autorité (comité, responsable désigné, ticket) et la date des faits.
-- Les pièces jointes identiques à un fichier séparé et Courriel_archive_17sept (copie d'E12) ne sont pas des confirmations indépendantes. INV-778 concerne un autre projet. Les notes personnelles anonymes n'ont aucune autorité.
-- Montants en CAD hors taxes ; distingue autorisé, facturé et payé.
-- Quand tu proposes des actions, indique si c'est un engagement documenté (avec preuve) ou une recommandation.`;
-
-function corpusText(): string {
-  const corpus: { sources: Src[] } = JSON.parse(readFileSync(CORPUS, "utf8"));
-  return corpus.sources
-    .filter((s) => s.id !== "README" && s.id !== "MANIFEST")
-    .map((s) => {
-      const pj = s.attachments.length ? ` [pièces jointes : ${s.attachments.map((a) => `${a.filename}${a.duplicateOf ? ` = ${a.duplicateOf}` : ""}`).join(", ")}]` : "";
-      return `##### ${s.id} (${s.path})${pj}\n${s.segments.filter((g) => g.text.trim()).map((g) => `${g.ref}\t${g.text}`).join("\n")}`;
-    })
-    .join("\n\n");
-}
+const corpusText = () => buildCorpusText(JSON.parse(readFileSync(CORPUS, "utf8")));
 
 function updateFiles(): string[] {
   const dir = join(MEMORY, "updates");
@@ -40,14 +22,10 @@ function updateFiles(): string[] {
 }
 
 function memoryText(version: string): string {
-  const baseline = readFileSync(join(MEMORY, "baseline.json"), "utf8");
-  let out = `=== MÉMOIRE BASELINE (état au 30 sept. 2026 09:00) ===\n${baseline}`;
-  for (const f of updateFiles()) {
-    const u = JSON.parse(readFileSync(join(MEMORY, "updates", f), "utf8"));
-    out += `\n\n=== MISE À JOUR ${u.version} (${u.label}) — elle remplace les éléments du baseline de même id ===\n${JSON.stringify(u)}`;
-    if (u.version === version) break;
-  }
-  return out;
+  const updates = updateFiles().map((f) => JSON.parse(readFileSync(join(MEMORY, "updates", f), "utf8")));
+  // « latest » : toutes les mises à jour (analyse d'un nouvel événement)
+  const target = version === "latest" ? (updates.at(-1)?.version ?? "baseline") : version;
+  return buildMemoryText(readFileSync(join(MEMORY, "baseline.json"), "utf8"), updates, target);
 }
 
 async function readBody(req: IncomingMessage): Promise<string> {
@@ -64,16 +42,11 @@ function send(res: ServerResponse, status: number, body: unknown) {
 
 async function chat(body: { version?: string; messages: { role: "user" | "assistant"; content: string }[] }) {
   const version = body.version ?? "baseline";
-  const asOf =
-    version === "baseline"
-      ? "Réponds selon l'état au 30 septembre 2026 à 09:00 (baseline), sans tenir compte d'événements postérieurs."
-      : `Réponds selon l'état après la mise à jour ${version} ; si c'est pertinent, signale ce qui a changé par rapport au baseline.`;
   const out = await complete({
     purpose: "chat",
     rules: RULES,
-    knowledge: `${memoryText(version)}\n\n=== CORPUS COMPLET ===\n${corpusText()}`,
-    // la consigne de date est fusionnée dans le dernier message utilisateur
-    turns: [...body.messages.slice(-10), { role: "user", content: `(${asOf})` }],
+    knowledge: knowledge(memoryText(version), corpusText()),
+    turns: chatTurns(body.messages, version),
     maxTokens: 2000,
     cache: true,
   });
@@ -119,7 +92,7 @@ async function ingestEvent(body: { title: string; text?: string }) {
   const out = await complete({
     purpose: "impact",
     rules: RULES,
-    knowledge: `${memoryText("latest")}\n\n=== CORPUS COMPLET ===\n${corpusText()}`,
+    knowledge: knowledge(memoryText("latest"), corpusText()),
     maxTokens: 16000,
     json: true,
     turns: [

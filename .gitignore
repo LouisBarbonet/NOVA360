@@ -32,3 +32,9 @@ NOVA360_remise.zip
 
 # Cache des réponses LLM (local)
 .cache/
+
+# Contexte généré pour le relais Cloudflare (npm run worker:data)
+worker/src/data.generated.json
+.wrangler/
+worker/.wrangler/
+worker/.dev.vars

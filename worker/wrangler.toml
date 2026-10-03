@@ -1,0 +1,23 @@
+# Relais du chat NOVA 360 (Cloudflare Workers, offre gratuite).
+# Déploiement : npm run worker:deploy  ·  Secret : npm run wrangler -- secret put GEMINI_API_KEY --config worker/wrangler.toml
+name = "nova360-chat"
+main = "src/index.ts"
+compatibility_date = "2026-09-01"
+
+[vars]
+# Seul le site publié (et le développement local) peut appeler le relais
+ALLOWED_ORIGINS = "https://louisbarbonet.github.io,http://localhost:5173,http://localhost:4173"
+GEMINI_MODEL = "gemini-flash-lite-latest"
+GEMINI_FALLBACK_MODEL = "gemini-flash-latest"
+# Questions libres envoyées à Gemini par jour, tous visiteurs confondus (le cache ne compte pas)
+DAILY_LIMIT = "150"
+
+[[kv_namespaces]]
+binding = "NOVA_KV"
+id = "A_REMPLIR"
+
+# 6 questions par minute et par adresse IP
+[[ratelimits]]
+name = "PER_IP"
+namespace_id = "1001"
+simple = { limit = 6, period = 60 }

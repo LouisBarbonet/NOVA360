@@ -13,9 +13,15 @@
     "export": "npm run build && tsx scripts/export.ts",
     "gemini:models": "tsx scripts/gemini-models.ts",
     "package": "npm run export && tsx scripts/package.ts",
-    "cache:clear": "node -e \"require('fs').rmSync('.cache/llm',{recursive:true,force:true});console.log('cache LLM vidé')\""
+    "cache:clear": "node -e \"require('fs').rmSync('.cache/llm',{recursive:true,force:true});console.log('cache LLM vidé')\"",
+    "wrangler": "npx -y -p node@22 node node_modules/wrangler/bin/wrangler.js",
+    "worker:data": "tsx scripts/worker-data.ts",
+    "worker:dev": "npm run worker:data && npm run wrangler -- dev --config worker/wrangler.toml",
+    "worker:deploy": "npm run worker:data && npm run wrangler -- deploy --config worker/wrangler.toml",
+    "precompute": "tsx scripts/precompute.ts"
   },
   "devDependencies": {
+    "@cloudflare/workers-types": "^5.20261003.1",
     "@types/node": "^26.6.4",
     "fflate": "^0.8.3",
     "happy-dom": "^20.14.5",
@@ -26,6 +32,7 @@
     "vite": "^6.4.3",
     "vite-plugin-singlefile": "^2.3.3",
     "vitest": "^3.2.7",
+    "wrangler": "^4.147.0",
     "xlsx": "^0.18.5"
   },
   "dependencies": {

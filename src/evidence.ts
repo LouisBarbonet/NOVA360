@@ -11,6 +11,12 @@ export function refMatches(segRef: string, r: string): boolean {
   }
   const cell = r.match(/^(.+)!([A-Z]+)(\d+)$/);
   if (cell) return segRef === `${cell[1]}!ligne ${cell[3]}`;
+  // Plage de cellules : « Risques!F2-H2 » ou « Plan projet!A2-G7 » → lignes 2 à 7 de la feuille
+  const span = r.match(/^(.+)!([A-Z]+)(\d+)-([A-Z]+)?(\d+)$/);
+  if (span) {
+    const row = segRef.match(/^(.+)!ligne (\d+)$/);
+    return !!row && row[1] === span[1] && Number(row[2]) >= Number(span[3]) && Number(row[2]) <= Number(span[5]);
+  }
   return segRef === r;
 }
 

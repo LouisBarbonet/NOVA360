@@ -1,6 +1,10 @@
 import "./style.css";
 import { memoryAt, versions } from "./data";
 import { esc, linkifyCitations } from "./ui";
+import { precomputedAnswer } from "./questions";
+
+// Relais du chat : serveur de dev en local, Cloudflare Worker pour le site publié (VITE_CHAT_URL au build)
+const CHAT_URL = import.meta.env.VITE_CHAT_URL || "api/chat";
 import * as V from "./views";
 
 const app = document.getElementById("app")!;
@@ -92,6 +96,8 @@ type Turn = { role: "user" | "assistant"; content: string };
 const history: Turn[] = [];
 // Réponses servies depuis le cache serveur (aucun quota consommé), par index dans l'historique
 const fromCache = new Set<number>();
+// Réponses pré-enregistrées (aucun appel réseau), par index dans l'historique
+const fromPrecomputed = new Set<number>();
 
 function bindChat() {
   const log = document.getElementById("chat-log")!;
@@ -99,7 +105,7 @@ function bindChat() {
   const input = form.querySelector("input")!;
   const paint = () => {
     log.innerHTML = history
-      .map((t, i) => `<div class="msg msg-${t.role}">${t.role === "user" ? esc(t.content) : linkifyCitations(t.content)}${fromCache.has(i) ? `<div class="cache-tag">⚡ réponse en cache : aucun quota consommé</div>` : ""}</div>`)
+      .map((t, i) => `<div class="msg msg-${t.role}">${t.role === "user" ? esc(t.content) : linkifyCitations(t.content)}${fromCache.has(i) ? `<div class="cache-tag">⚡ réponse en cache : aucun quota consommé</div>` : ""}${fromPrecomputed.has(i) ? `<div class="cache-tag">📌 réponse pré-enregistrée (générée à l'avance avec le même modèle)</div>` : ""}</div>`)
       .join("");
     log.scrollTop = log.scrollHeight;
   };
@@ -109,8 +115,16 @@ function bindChat() {
     history.push({ role: "user", content: q });
     history.push({ role: "assistant", content: "…" });
     paint();
+    // Première question identique à une question d'exemple : réponse pré-enregistrée, sans appel réseau
+    const pre = history.length === 2 ? precomputedAnswer(version, q) : undefined;
+    if (pre) {
+      history[history.length - 1].content = pre.answer;
+      fromPrecomputed.add(history.length - 1);
+      paint();
+      return;
+    }
     try {
-      const res = await fetch("api/chat", {
+      const res = await fetch(CHAT_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ version, messages: history.slice(0, -1) }),
@@ -119,8 +133,9 @@ function bindChat() {
       history[history.length - 1].content = res.ok ? data.answer : `⚠ ${data.error ?? res.statusText}`;
       if (res.ok && data.cached) fromCache.add(history.length - 1);
     } catch {
-      history[history.length - 1].content =
-        "⚠ Chat indisponible dans cet export statique (il nécessite `npm run dev` et une clé API). Utilisez les pages Questions, Recherche et Sources, qui fonctionnent hors ligne.";
+      history[history.length - 1].content = import.meta.env.VITE_CHAT_URL
+        ? "⚠ Le service de chat ne répond pas pour le moment. Les questions d'exemple restent disponibles (réponses pré-enregistrées), ainsi que les pages Questions, Recherche et Sources."
+        : "⚠ Chat indisponible dans cet export hors ligne (il nécessite `npm run dev` et une clé API). Les questions d'exemple restent disponibles (réponses pré-enregistrées), ainsi que les pages Questions, Recherche et Sources.";
     }
     paint();
   };

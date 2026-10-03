@@ -3,6 +3,7 @@ import { corpus, getSource, updates, baseline } from "./data";
 import type { Cite, Memory, Source, Update } from "./types";
 import { badge, cite, cites, esc, fmtDate, markdown, money } from "./ui";
 import { excerpt, refMatches } from "./evidence";
+import { EXAMPLE_QUESTIONS } from "./questions";
 import modeEmploi from "../MODE_EMPLOI.md?raw";
 
 const isChanged = (m: Memory, key: string) => (m.changed?.has(key) ? " changed" : "");
@@ -373,18 +374,9 @@ function newEventForm(): string {
 
 // ───────────────────────── Chat ─────────────────────────
 export function viewChat(): string {
-  const examples = [
-    "Quelle est la date de livraison actuellement prévue et pourquoi?",
-    "Quelles décisions ont été prises concernant le fournisseur?",
-    "Quels engagements ne sont toujours pas complétés?",
-    "Existe-t-il des informations contradictoires?",
-    "Quels sont les trois principaux risques du projet aujourd'hui?",
-    "Pourquoi la décision Canada Central a-t-elle été prise?",
-    "Qu'est-ce qui a changé depuis la semaine dernière?",
-    "Si je devais reprendre le projet demain matin, que devrais-je savoir?",
-  ];
+  const examples = EXAMPLE_QUESTIONS;
   return `<h1>Interroger le projet</h1>
-  <p class="muted">Réponses générées à partir du corpus et de la mémoire, avec citations cliquables. Le LLM peut se tromper : vérifiez toujours les preuves citées.</p>
+  <p class="muted">Réponses générées à partir du corpus et de la mémoire, avec citations cliquables. Le LLM peut se tromper : vérifiez toujours les preuves citées. Les questions d'exemple ont une réponse pré-enregistrée ; les questions libres passent par Gemini (quota limité).</p>
   <div class="chips">${examples.map((e) => `<button class="chip example">${esc(e)}</button>`).join("")}</div>
   <div id="chat-log" class="chat-log"></div>
   <form id="chat-form" class="search"><input name="q" placeholder="Posez une question en langage naturel…" autocomplete="off"><button>Envoyer</button></form>`;

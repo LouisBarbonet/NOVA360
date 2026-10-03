@@ -4,6 +4,7 @@ import Anthropic from "@anthropic-ai/sdk";
 import { ApiError, GoogleGenAI } from "@google/genai";
 import { existsSync, readFileSync } from "node:fs";
 import { cacheKey, readCache, writeCache } from "./cache";
+import { alternate } from "./prompt";
 
 export type Turn = { role: "user" | "assistant"; content: string };
 type Purpose = "chat" | "impact";
@@ -42,16 +43,6 @@ export function assertConfigured() {
   } else if (!process.env.ANTHROPIC_API_KEY && !process.env.ANTHROPIC_AUTH_TOKEN) {
     throw httpError("Aucune clé API : définissez ANTHROPIC_API_KEY dans le fichier .env (ou NOVA_PROVIDER=gemini avec GEMINI_API_KEY).", 503);
   }
-}
-
-/** Fusionne les tours consécutifs du même rôle (les deux API exigent l'alternance). */
-function alternate(turns: Turn[]): Turn[] {
-  return turns.reduce<Turn[]>((acc, t) => {
-    const last = acc[acc.length - 1];
-    if (last && last.role === t.role) last.content = `${last.content}\n${t.content}`;
-    else acc.push({ ...t });
-    return acc;
-  }, []);
 }
 
 /**

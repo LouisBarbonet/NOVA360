@@ -2,20 +2,13 @@
 import { createHash } from "node:crypto";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
+import { normalize } from "./prompt";
+
+export { normalize };
 
 const DIR = ".cache/llm";
 
 const sha = (s: string) => createHash("sha256").update(s).digest("hex");
-
-/** Normalise une question, ligne par ligne : casse, espaces et ponctuation finale n'empêchent pas la correspondance. */
-export const normalize = (s: string) =>
-  s
-    .normalize("NFC")
-    .toLowerCase()
-    .split(/\r?\n/)
-    .map((line) => line.replace(/\s+/g, " ").replace(/[\s?!.…]+$/u, "").trim())
-    .filter(Boolean)
-    .join("\n");
 
 /** Clé stable ; le contenu volumineux (mémoire + corpus) n'entre que par son empreinte. */
 export function cacheKey(parts: { provider: string; model: string; purpose: string; rules: string; knowledge: string; turns: { role: string; content: string }[]; maxTokens: number; json?: boolean }): string {
