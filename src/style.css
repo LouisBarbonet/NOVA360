@@ -195,3 +195,7 @@ button { font: inherit; padding: .5rem .9rem; border-radius: 8px; border: 1px so
   details > summary { display: none; }
   .card, .answer, .quote { break-inside: avoid; }
 }
+.msg-assistant h2, .msg-assistant h3, .msg-assistant h4, .msg-assistant h5 { font-size: 1rem; margin: .8rem 0 .3rem; }
+.msg-assistant p, .msg-assistant ul { margin: .35rem 0; }
+.msg-assistant hr { border: 0; border-top: 1px solid var(--line); margin: .6rem 0; }
+.msg-assistant .cite { margin: 0 2px; }

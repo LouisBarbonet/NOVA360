@@ -1,5 +1,6 @@
 import type { Cite, Level } from "./types";
 import { getSource } from "./data";
+import { refMatches } from "./evidence";
 
 export const esc = (s: unknown): string =>
   String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]!);
@@ -13,11 +14,18 @@ export function citeHref(c: Cite): string {
   return `#/source/${encodeURIComponent(c.s)}?r=${encodeURIComponent(c.r)}`;
 }
 
-/** Lien de preuve cliquable : « fichier · repère ». */
+/** Une citation est valide si la source existe et si le repère y désigne au moins un passage. */
+export function citeIsValid(c: Cite): boolean {
+  const src = getSource(c.s);
+  return !!src && src.segments.some((g) => refMatches(g.ref, c.r));
+}
+
+/** Lien de preuve cliquable : « fichier · repère ». Rouge si la source ou le repère est introuvable. */
 export function cite(c: Cite): string {
   const src = getSource(c.s);
-  const title = src ? `${src.path} — ${c.r}` : `Source inconnue : ${c.s}`;
-  return `<a class="cite${src ? "" : " cite-broken"}" href="${citeHref(c)}" title="${esc(title)}">${esc(c.s)}<span>${esc(c.r)}</span></a>`;
+  const ok = citeIsValid(c);
+  const title = !src ? `Source inconnue : ${c.s}` : ok ? `${src.path} — ${c.r}` : `Repère introuvable dans ${src.path} : ${c.r}`;
+  return `<a class="cite${ok ? "" : " cite-broken"}" href="${citeHref(c)}" title="${esc(title)}">${esc(c.s)}<span>${esc(c.r)}</span></a>`;
 }
 
 export const cites = (list: Cite[] | undefined) =>
@@ -25,36 +33,49 @@ export const cites = (list: Cite[] | undefined) =>
 
 export const badge = (text: string, level: Level | string) => `<span class="badge badge-${esc(level)}">${esc(text)}</span>`;
 
-/** Transforme les marqueurs [[ID:repère]] produits par le chat en liens de preuve. */
-export function linkifyCitations(text: string): string {
-  return esc(text)
-    .replace(/\[\[([^\]:]+):([^\]]+)\]\]/g, (_, s: string, r: string) => cite({ s: s.trim(), r: r.trim() }))
+/** Mise en forme d'une ligne : échappement, puis code, gras et (optionnellement) marqueurs de citation. */
+function inline(s: string, withCitations: boolean): string {
+  let out = esc(s);
+  if (withCitations) {
+    // Tolère les variantes produites par les LLM : [[ID:r]], [ID:r], [[A:r], [B:r]] et [[ACC-303:L6,L14]].
+    // Seuls les identifiants de sources connues deviennent des liens ; le reste est laissé tel quel.
+    out = out.replace(/\[{1,2}([A-Za-z0-9_.\-]+):([^\[\]]+?)\]{1,2}/g, (whole, src: string, r: string) =>
+      getSource(src.trim())
+        ? r.split(/\s*[,;]\s*/).filter(Boolean).map((part) => cite({ s: src.trim(), r: part.trim() })).join("")
+        : whole,
+    );
+  }
+  return out
+    .replace(/`([^`]+)`/g, "<code>$1</code>")
     .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>")
-    .replace(/\n/g, "<br>");
+    .replace(/(^|[^*\w])\*([^*\n]+?)\*(?![*\w])/g, "$1<em>$2</em>");
 }
 
-/** Markdown minimal (titres, listes, gras, code, paragraphes) pour le mode d'emploi. */
-export function markdown(md: string): string {
-  const inline = (s: string) =>
-    esc(s)
-      .replace(/`([^`]+)`/g, "<code>$1</code>")
-      .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>");
+/** Markdown minimal : titres, listes, séparateurs, gras, code, paragraphes. */
+function render(md: string, withCitations: boolean): string {
   const out: string[] = [];
   let list = false;
   for (const line of md.split(/\r?\n/)) {
-    const h = line.match(/^(#{1,3}) (.*)/);
+    const h = line.match(/^(#{1,4}) (.*)/);
     const li = line.match(/^\s*[-*] (.*)/) ?? line.match(/^\s*\d+\. (.*)/);
     if (!li && list) {
       out.push("</ul>");
       list = false;
     }
-    if (h) out.push(`<h${h[1].length + 1}>${inline(h[2])}</h${h[1].length + 1}>`);
+    if (h) out.push(`<h${Math.min(h[1].length + 1, 5)}>${inline(h[2], withCitations)}</h${Math.min(h[1].length + 1, 5)}>`);
+    else if (/^\s*(-{3,}|\*{3,})\s*$/.test(line)) out.push("<hr>");
     else if (li) {
       if (!list) out.push("<ul>");
       list = true;
-      out.push(`<li>${inline(li[1])}</li>`);
-    } else if (line.trim()) out.push(`<p>${inline(line)}</p>`);
+      out.push(`<li>${inline(li[1], withCitations)}</li>`);
+    } else if (line.trim()) out.push(`<p>${inline(line, withCitations)}</p>`);
   }
   if (list) out.push("</ul>");
   return out.join("\n");
 }
+
+/** Réponse du chat : Markdown + marqueurs [[ID:repère]] transformés en liens de preuve. */
+export const linkifyCitations = (text: string) => render(text, true);
+
+/** Markdown du mode d'emploi. */
+export const markdown = (md: string) => render(md, false);

@@ -66,18 +66,35 @@ async function claude(model: string, opts: { rules: string; knowledge: string; m
   return { text: msg.content.map((b) => (b.type === "text" ? b.text : "")).join(""), provider: "claude", model: msg.model };
 }
 
+const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+// Surcharge temporaire côté Google (503/500) : on réessaie, puis on bascule sur un modèle de repli
+const isOverloaded = (e: unknown) => e instanceof ApiError && (e.status === 503 || e.status === 500);
+
 async function gemini(model: string, opts: { rules: string; knowledge: string; maxTokens: number }, turns: Turn[]): Promise<Completion> {
   const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+  const fallback = process.env.GEMINI_FALLBACK_MODEL || "gemini-flash-lite-latest";
+  const attempts = [model, model, model, ...(fallback !== model ? [fallback] : [])];
   try {
-    const res = await ai.models.generateContent({
-      model,
-      contents: turns.map((t) => ({ role: t.role === "assistant" ? "model" : "user", parts: [{ text: t.content }] })),
-      config: { systemInstruction: `${opts.rules}\n\n${opts.knowledge}`, maxOutputTokens: opts.maxTokens },
-    });
-    const text = res.text;
-    if (!text) throw httpError(`Gemini n'a renvoyé aucun texte (motif : ${res.candidates?.[0]?.finishReason ?? "inconnu"}).`, 502);
-    return { text, provider: "gemini", model };
+    for (let i = 0; ; i++) {
+      const current = attempts[i];
+      try {
+        const res = await ai.models.generateContent({
+          model: current,
+          contents: turns.map((t) => ({ role: t.role === "assistant" ? "model" : "user", parts: [{ text: t.content }] })),
+          config: { systemInstruction: `${opts.rules}\n\n${opts.knowledge}`, maxOutputTokens: opts.maxTokens },
+        });
+        const text = res.text;
+        if (!text) throw httpError(`Gemini n'a renvoyé aucun texte (motif : ${res.candidates?.[0]?.finishReason ?? "inconnu"}).`, 502);
+        return { text, provider: "gemini", model: current };
+      } catch (e) {
+        if (!isOverloaded(e) || i === attempts.length - 1) throw e;
+        await sleep(2000 * (i + 1));
+      }
+    }
   } catch (e) {
+    if (isOverloaded(e)) {
+      throw httpError(`Gemini est surchargé en ce moment (${model} puis ${fallback}). Réessayez dans une minute, ou passez NOVA_PROVIDER=claude dans .env.`, 503);
+    }
     if (e instanceof ApiError && e.status === 429) {
       throw httpError("Quota gratuit Gemini atteint (requêtes par minute ou par jour). Réessayez plus tard, ou passez NOVA_PROVIDER=claude dans .env.", 429);
     }

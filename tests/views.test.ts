@@ -61,3 +61,37 @@ describe("cohérence financière", () => {
     for (const i of f.invoices) expect(i.lines.reduce((s, l) => s + l.amount, 0)).toBe(i.total);
   });
 });
+
+describe("citations produites par le chat", () => {
+  it("découpe un repère groupé en plusieurs liens valides", async () => {
+    const { linkifyCitations } = await import("../src/ui");
+    const html = linkifyCitations("Voir [[ACC-303:L6,L14]] et [[M04:L17-L23]].");
+    expect(html.match(/class="cite"/g)).toHaveLength(3);
+    expect(html).not.toContain("cite-broken");
+  });
+});
+
+describe("garde-fou sur les repères", () => {
+  it("marque en rouge un repère inexistant même si la source existe", async () => {
+    const { linkifyCitations } = await import("../src/ui");
+    expect(linkifyCitations("[[M04:L999]]")).toContain("cite-broken");
+    expect(linkifyCitations("[[M04:L17-L23]]")).not.toContain("cite-broken");
+  });
+  it("rend titres, listes et séparateurs du chat", async () => {
+    const { linkifyCitations } = await import("../src/ui");
+    const html = linkifyCitations("### Titre\n---\n* **gras** [[E05:L5]]");
+    expect(html).toContain("<h4>Titre</h4>");
+    expect(html).toContain("<hr>");
+    expect(html).toContain("<li><strong>gras</strong>");
+  });
+});
+
+describe("variantes de citations des LLM", () => {
+  it("lie [[A:x], [B:y]] et l'italique, sans toucher aux crochets ordinaires", async () => {
+    const { linkifyCitations } = await import("../src/ui");
+    const html = linkifyCitations("*État* : voir [[SEC-210:L25], [M06:L7]] et [note:importante].");
+    expect(html.match(/class="cite"/g)).toHaveLength(2);
+    expect(html).toContain("<em>État</em>");
+    expect(html).toContain("[note:importante]");
+  });
+});
