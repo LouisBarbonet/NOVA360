@@ -11,10 +11,12 @@
     "validate": "tsx scripts/validate.ts",
     "test": "vitest run",
     "export": "npm run build && tsx scripts/export.ts",
-    "gemini:models": "tsx scripts/gemini-models.ts"
+    "gemini:models": "tsx scripts/gemini-models.ts",
+    "package": "npm run export && tsx scripts/package.ts"
   },
   "devDependencies": {
     "@types/node": "^26.6.4",
+    "fflate": "^0.8.3",
     "happy-dom": "^20.14.5",
     "prettier": "^3.9.5",
     "tsx": "^4.23.15",

@@ -27,3 +27,4 @@ Défi Loto-Québec « Projet 360 / NOVA ». C'est une mémoire consultable et so
 | `npm test` | Rendu de toutes les pages, surlignage des preuves, montants, superposition des mises à jour |
 | `npm run export` | Construit `dist/` et régénère `livrables/` (Markdown + PDF du brief, par version) |
 | `npm run gemini:models` | Liste les modèles Gemini accessibles avec la clé (pour régler `GEMINI_MODEL`) |
+| `npm run package` | Refait l'export puis `NOVA360_remise.zip` (app autonome + livrables + mode d'emploi), avec contrôle anti-clé API |

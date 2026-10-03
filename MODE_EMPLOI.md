@@ -9,7 +9,7 @@ Mémoire opérationnelle du projet NOVA, établie à partir des 64 fichiers du c
   - **Claude (par défaut)** : `ANTHROPIC_API_KEY` (console.anthropic.com, crédits prépayés).
   - **Gemini (secours gratuit)** : `NOVA_PROVIDER=gemini` et `GEMINI_API_KEY` (aistudio.google.com). Les quotas gratuits sont bas : l'app affiche un message clair quand ils sont atteints. `npm run gemini:models` liste les modèles disponibles pour `GEMINI_MODEL`.
 
-- **Livrables hors application** : `livrables/<version>/` contient le brief (Markdown + PDF d'une page), les réponses Q01–Q10 avec extraits, la mémoire et le dossier de décisions. On les régénère avec `npm run export`.
+- **Livrables hors application** : `livrables/<version>/` contient le brief (Markdown + PDF d'une page), les réponses Q01–Q10 avec extraits, la mémoire et le dossier de décisions. On les régénère avec `npm run export` ; `npm run package` refait en plus le zip de remise `NOVA360_remise.zip`.
 
 ## Naviguer
 
