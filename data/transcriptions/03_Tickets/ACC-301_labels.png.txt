@@ -1,0 +1,6 @@
+[Transcription manuelle de capture d'écran]
+Bandeau : NOVA — Test accessibilité — https://nova.demo.local
+Titre de page : Formulaire de création
+Formulaire : « Créer une demande »
+Champ texte avec placeholder : « Votre nom »
+Annotation en rouge : « Le placeholder disparaît dès la saisie; aucun libellé associé n'est exposé. »

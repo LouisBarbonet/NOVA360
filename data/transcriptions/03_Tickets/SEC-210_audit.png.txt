@@ -1,0 +1,9 @@
+[Transcription manuelle de capture d'écran]
+Bandeau : NOVA — Environnement de validation — https://nova.demo.local
+Titre de page : Journal d'audit - administrateur
+Tableau (Heure | Utilisateur | Action | Objet | Résultat) :
+14:02:10 | np.admin | LOGIN | Portail | SUCCÈS
+14:03:44 | np.admin | VIEW_RECORD | Dossier 8401 | SUCCÈS
+14:04:08 | np.admin | EXPORT_CSV | --- | ---
+14:05:12 | np.admin | LOGOUT | Portail | SUCCÈS
+Encadré « Observation QA » : « Une exportation CSV a été effectuée à 14:04, mais aucun événement détaillé n'est visible. »

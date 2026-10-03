@@ -1,0 +1,14 @@
+{
+  "version": "U1",
+  "label": "U1 — Répétition : SEC-210 accepté (1er oct. 2026)",
+  "asOf": "2026-10-01T10:00:00-04:00",
+  "event": { "title": "Courriel simulé de Sophie Lambert", "summary": "Re-test réussi, SEC-210 accepté par la sécurité.", "sources": [{ "s": "SEC-210", "r": "L25" }] },
+  "changes": [{ "what": "GL-1", "before": "Correctif livré, non accepté", "after": "Accepté par la sécurité", "sources": [{ "s": "SEC-210", "r": "L25" }] }],
+  "affected": [{ "ref": "Q08", "impact": "La sécurité est désormais acceptée", "sources": [{ "s": "SEC-210", "r": "L25" }] }],
+  "unchanged": [{ "ref": "GL-2", "why": "Aucune preuve de fermeture d'ACC-303", "sources": [{ "s": "ACC-303", "r": "L16" }] }],
+  "patch": {
+    "goLiveConditions": [{ "id": "GL-1", "status": "Accepté par Sophie Lambert le 1er oct.", "level": "ok" }],
+    "actions": [{ "id": "A-14", "title": "Mettre à jour le rapport de statut (sécurité)", "owner": "Nicolas Perron", "ownerStatus": "proposé", "due": "à confirmer", "origin": "recommandation équipe", "status": "à faire", "sources": [{ "s": "Rapport_Statut_21sept", "r": "p.1" }] }],
+    "timeline": [{ "date": "2026-10-01", "type": "validation", "topic": "securite", "title": "SEC-210 accepté", "sources": [{ "s": "SEC-210", "r": "L25" }] }]
+  }
+}

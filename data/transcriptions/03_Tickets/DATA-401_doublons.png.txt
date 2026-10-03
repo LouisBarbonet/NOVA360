@@ -1,0 +1,8 @@
+[Transcription manuelle de capture d'écran]
+Bandeau : NOVA — Lot MIG-09-02 — https://nova.demo.local
+Titre de page : Résultats de migration
+Tableau (ID | Demandeur | Courriel | Créé | Statut) :
+8401 | Alex Martin | alex.martin@example.org | 15:03:12 | Nouveau   (encadré rouge)
+8402 | Alex Martin | alex.martin@example.org | 15:03:13 | Nouveau   (encadré rouge)
+8403 | Sam Tremblay | sam.t@example.org | 15:04:01 | Nouveau
+Les lignes 8401 et 8402 sont signalées comme doublons (même demandeur, même courriel, une seconde d'écart).

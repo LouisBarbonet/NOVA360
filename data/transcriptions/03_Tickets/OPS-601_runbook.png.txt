@@ -1,0 +1,8 @@
+[Transcription manuelle de capture d'écran]
+Bandeau : NOVA — Version du 25 septembre — https://nova.demo.local
+Titre de page : Runbook de mise en production
+1. Vérifier la santé des services — OK
+2. Activer le mode maintenance — OK
+3. Déployer la version approuvée — OK
+4. Procédure de retour arrière — TODO
+5. Validation fonctionnelle post-déploiement — À compléter

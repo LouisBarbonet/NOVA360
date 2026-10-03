@@ -1,0 +1,5 @@
+[Transcription manuelle de capture d'écran]
+Bandeau : NOVA — Build 2026.09.17 — https://nova.demo.local
+Titre de page : Fenêtre de modification
+Modale « Modifier le dossier » : champ « Nom du demandeur » (Camille Roy), champ « Commentaire », bouton « Enregistrer » encadré en rouge
+Annotation en rouge : « Le focus clavier ne rejoint pas ce bouton »

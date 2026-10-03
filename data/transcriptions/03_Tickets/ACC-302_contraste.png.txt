@@ -1,0 +1,5 @@
+[Transcription manuelle de capture d'écran]
+Bandeau : NOVA — Build 2026.08.12 — https://nova.demo.local
+Titre de page : Portail NOVA
+Bloc « État de la demande » : badge « EN ATTENTE DE VALIDATION » en gris très pâle sur fond gris (contraste visiblement insuffisant)
+Note : « Capture reçue avec le ticket : « le bleu/gris est bizarre » »

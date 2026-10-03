@@ -1,0 +1,7 @@
+[Transcription manuelle de capture d'écran]
+Bandeau : NOVA — Chrome - réseau entreprise — https://nova.demo.local
+Titre de page : Analyse de performance
+DOMContentLoaded — 2.4 s
+Largest Contentful Paint — 7.8 s (en rouge)
+API /dossiers/search — 6.9 s (en rouge)
+Transfert — 1.3 MB
