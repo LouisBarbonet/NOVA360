@@ -14,13 +14,26 @@ const httpError = (message: string, status: number) => Object.assign(new Error(m
 
 /** Relit .env à chaque appel : changer de modèle ou de fournisseur ne demande pas de redémarrer le serveur. */
 // (loadEnv de Vite ne convient pas ici : il donne priorité aux valeurs déjà en mémoire, donc aux anciennes)
-function refreshEnv() {
-  for (const file of [".env", ".env.local"]) {
-    if (!existsSync(file)) continue;
-    for (const line of readFileSync(file, "utf8").split(/\r?\n/)) {
-      const m = line.match(/^\s*([A-Z0-9_]+)\s*=\s*(.*?)\s*$/);
-      if (m) process.env[m[1]] = m[2].replace(/^(["'])(.*)\1$/, "$2");
-    }
+// Une variable retirée de .env doit cesser d'agir : on gère toutes celles documentées dans .env.example
+// et celles déjà lues depuis .env (sinon une ancienne valeur resterait active en mémoire).
+const managedKeys = new Set<string>();
+const parseEnvFile = (file: string) => {
+  const out = new Map<string, string>();
+  if (!existsSync(file)) return out;
+  for (const line of readFileSync(file, "utf8").split(/\r?\n/)) {
+    const m = line.match(/^\s*([A-Z0-9_]+)\s*=\s*(.*?)\s*$/);
+    if (m) out.set(m[1], m[2].replace(/^(["'])(.*)\1$/, "$2"));
+  }
+  return out;
+};
+
+export function refreshEnv() {
+  for (const k of parseEnvFile(".env.example").keys()) managedKeys.add(k);
+  const current = new Map([...parseEnvFile(".env"), ...parseEnvFile(".env.local")]);
+  for (const k of managedKeys) if (!current.has(k)) delete process.env[k];
+  for (const [k, v] of current) {
+    process.env[k] = v;
+    managedKeys.add(k);
   }
 }
 
