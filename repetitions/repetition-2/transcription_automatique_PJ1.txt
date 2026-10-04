@@ -1,0 +1,8 @@
+[Transcription automatique (LLM) — à relire]
+Bandeau : NOVA, Version du 1er octobre — finale, URL : https://nova.demo.local
+Titre de page : Runbook de mise en production
+1. Vérifier la santé des services | OK (en vert)
+2. Activer le mode maintenance | OK (en vert)
+3. Déployer la version approuvée | OK (en vert)
+4. Procédure de retour arrière | OK — voir annexe A (en vert)
+5. Validation fonctionnelle post-déploiement | OK — 12 scénarios (en vert)

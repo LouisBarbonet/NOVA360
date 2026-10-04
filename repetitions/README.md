@@ -11,3 +11,11 @@ Ces fichiers ne sont **pas chargés par l'application**. Ils documentent les tes
 - **Relecture humaine** : GL-1 retiré du patch (déclaré « inchangé » mais reformulé par le modèle).
 - **Résultat** (`U1_gemini_courriel_boreal_1er_oct.json`) : 57 citations validées, baseline intact, brief U1 sur une page avec encadré des changements.
 - Durée : environ 1 minute d'analyse (Gemini Flash surchargé, réponse par Flash-Lite), puis 2 minutes de relecture.
+
+## Répétition 2 — courriel avec pièces jointes (capture + PDF), téléversé, analysé par Gemini
+
+- **Événement inventé** (`repetition-2/Courriel_Olivier_runbook.eml`) : Olivier transmet le runbook final reçu de Boréal (capture d'écran + annexe A en PDF, absentes du corpus), mais précise que ce n'est **pas encore une approbation** (test par son équipe d'ici le 6 oct.).
+- **Pièges testés** : pièces jointes nouvelles dans un courriel ; capture à transcrire ; livré ≠ approuvé (GL-3 doit rester ouvert) ; ne rien fermer d'autre.
+- **Ingestion** : courriel (13 segments), capture transcrite automatiquement par le LLM (8 lignes, fidèle à l'image, marquée « à relire » : `transcription_automatique_PJ1.txt`), PDF extrait.
+- **Incidents réels** : quota quotidien du modèle principal épuisé (20 requêtes/jour/modèle) → ajout d'une échelle de modèles de repli ; JSON invalide (guillemet manquant) malgré le mode JSON → réparation avec `jsonrepair` ; éléments reformulés sans raison → garde-fous (un élément modifié doit citer la nouvelle source ; un élément déclaré inchangé ne peut pas être modifié).
+- **Résultat** (`U1_gemini_runbook_recu.json`) : patch limité à runbook, GL-3, A-04, A-05 (échéance du 6 oct. documentée par Olivier), Q10, RK-1, RK-2 ; brief révisé (thèmes « Date approuvée et conditions » et « Priorités ») ; 50 citations validées ; GL-1 et GL-2 inchangés ; brief U1 sur une page.

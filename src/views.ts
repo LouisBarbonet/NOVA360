@@ -46,7 +46,13 @@ export function viewBrief(m: Memory): string {
     <p class="muted">${esc(m.label)}</p>
     ${updateBanner(m)}
     <dl class="brief-grid">
-      ${m.brief.sections.map((s) => `<dt>${esc(s.theme)}</dt><dd>${esc(s.text)} ${cites(s.sources)}</dd>`).join("")}
+      ${m.brief.sections
+        .map((s) => {
+          // Thème réécrit par une mise à jour : signalé (le baseline reste consultable avec le sélecteur de version)
+          const revised = m.version !== "baseline" && baseline.brief.sections.find((b) => b.theme === s.theme)?.text !== s.text;
+          return `<dt>${esc(s.theme)}${revised ? ` <span class="tag-changed">révisé · ${esc(m.version)}</span>` : ""}</dt><dd class="${revised ? "changed" : ""}">${esc(s.text)} ${cites(s.sources)}</dd>`;
+        })
+        .join("")}
     </dl>
     <h2>Conditions de go-live → actions</h2>
     <div class="table-wrap"><table>
@@ -270,14 +276,23 @@ export function viewSource(id: string, params: URLSearchParams, m: Memory): stri
     ...m.contradictions.filter((c) => JSON.stringify(c).includes(`"s":"${id}"`)).map((c) => `<a href="#/contradictions">${c.id}</a>`),
     ...m.actions.filter((a) => a.sources.some((c) => c.s === id)).map((a) => `<a href="#/actions">${a.id}</a>`),
   ];
-  const raw = `corpus/${s.path}`;
+  const raw = `corpus/${s.raw ?? s.path}`;
   return `<p><a href="javascript:history.back()">← Retour</a></p>
   <h1>${esc(s.id)}</h1>
-  <p class="muted">${esc(s.path)}${s.transcription ? " · <strong>transcription manuelle de la capture</strong>" : ""}</p>
+  <p class="muted">${esc(s.path)}${s.transcription === "automatique" ? " · <span class=\"noise\">⚠ transcription automatique (LLM), à relire contre l'image</span>" : s.transcription ? " · <strong>transcription manuelle de la capture</strong>" : ""}</p>
   ${noise ? `<p class="noise">⚠ ${esc(noise.reason)}</p>` : ""}
-  ${s.attachments.length ? `<p>Pièces jointes : ${s.attachments.map((a) => (a.duplicateOf ? `${esc(a.filename)} = <a href="#/source/${encodeURIComponent(a.duplicateOf)}">${esc(a.duplicateOf)}</a> (même document, pas une preuve indépendante)` : esc(a.filename))).join(", ")}</p>` : ""}
+  ${s.parent ? `<p>Pièce jointe du courriel <a href="#/source/${encodeURIComponent(s.parent)}">${esc(s.parent)}</a>.</p>` : ""}
+  ${s.attachments.length ? `<p>Pièces jointes : ${s.attachments
+    .map((a) =>
+      a.duplicateOf
+        ? `${esc(a.filename)} = <a href="#/source/${encodeURIComponent(a.duplicateOf)}">${esc(a.duplicateOf)}</a> (même document, pas une preuve indépendante)`
+        : a.extractedAs
+          ? `${esc(a.filename)} → extraite comme <a href="#/source/${encodeURIComponent(a.extractedAs)}">${esc(a.extractedAs)}</a>`
+          : esc(a.filename),
+    )
+    .join(", ")}</p>` : ""}
   ${usedIn.length ? `<p>Cité dans : ${usedIn.join(" · ")}</p>` : ""}
-  ${s.ext === ".png" ? `<img class="capture${r === "capture" ? " hl-img" : ""}" src="${raw}" alt="Capture ${esc(s.id)}">` : ""}
+  ${[".png", ".jpg", ".jpeg"].includes(s.ext) ? `<img class="capture${r === "capture" ? " hl-img" : ""}" src="${raw}" alt="Capture ${esc(s.id)}">` : ""}
   ${s.ext === ".pdf" ? `<p><a href="${raw}" target="_blank" rel="noopener">Ouvrir le PDF original ↗</a></p>` : ""}
   <div class="segments">
     ${s.segments
@@ -355,13 +370,17 @@ function newEventForm(): string {
   return `<section class="card new-event">
     <h2>Intégrer un nouvel événement</h2>
     <ol class="muted">
-      <li>Collez le texte de l'événement (ou déposez le fichier dans <code>NOVA_ETUDIANTS/…/09_Nouvel_evenement/</code> et laissez le texte vide).</li>
+      <li>Collez le texte de l'événement <strong>ou</strong> ajoutez un ou plusieurs fichiers, dans n'importe quel format du corpus (.eml, .pdf, .xlsx, .png, .txt, .md, .csv). Les pièces jointes des courriels sont extraites, et les captures d'écran sont transcrites automatiquement (transcription marquée « à relire »).</li>
       <li>Le système extrait la source, puis le LLM rédige un brouillon d'impact (changements, éléments touchés, actions) avec ses citations.</li>
       <li>L'équipe relit et corrige le JSON, puis l'enregistre comme nouvelle version. Le baseline reste intact.</li>
     </ol>
     <form id="event-form">
       <label>Identifiant / titre court <input name="title" placeholder="ex. Courriel Sophie 1er octobre" required></label>
       <label>Texte de l'événement <textarea name="text" rows="6" placeholder="Collez ici le courriel, la note ou la transcription…"></textarea></label>
+      <label class="dropzone" id="event-drop">Fichiers de l'événement (cliquez ou glissez-déposez ici)
+        <input type="file" name="files" multiple accept=".eml,.pdf,.xlsx,.xls,.png,.jpg,.jpeg,.txt,.md,.csv">
+        <span id="event-files" class="muted"></span>
+      </label>
       <button>1. Ingérer et analyser l'impact</button>
     </form>
     <div id="event-status" class="muted"></div>

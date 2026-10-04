@@ -8,7 +8,11 @@ export type Source = {
   ext: string;
   title: string;
   meta: Record<string, string>;
-  attachments: { filename: string; duplicateOf?: string }[];
+  attachments: { filename: string; duplicateOf?: string; extractedAs?: string }[];
+  /** Fichier brut servi par l'app (pièce jointe extraite d'un courriel) */
+  raw?: string;
+  /** Pièce jointe : identifiant du courriel parent */
+  parent?: string;
   segments: Segment[];
   transcription?: string;
 };

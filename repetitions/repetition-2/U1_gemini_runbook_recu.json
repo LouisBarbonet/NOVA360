@@ -1,0 +1,455 @@
+{
+  "version": "U1",
+  "label": "U1 — Réception du runbook final (1er oct. 2026)",
+  "asOf": "2026-10-01T15:40:00-04:00",
+  "event": {
+    "title": "Boréal transmet le runbook final et l'annexe A de retour arrière (OPS-601)",
+    "summary": "Boréal a transmis le 1er octobre la version finale du runbook (étapes 4 et 5 complétées) et l'annexe A (procédure de retour arrière en 5 étapes, durée estimée 35 min, exécutable sans l'équipe projet). Olivier Côté a reçu les documents, mais précise qu'il ne s'agit pas encore d'une approbation : il doit faire exécuter la procédure par une personne de son équipe d'ici le 6 octobre.",
+    "sources": [
+      {
+        "s": "EVT-01_Courriel_Olivier_runbook",
+        "r": "L3-L7"
+      },
+      {
+        "s": "EVT-01_Courriel_Olivier_runbook_PJ1",
+        "r": "L2-L8"
+      },
+      {
+        "s": "EVT-01_Courriel_Olivier_runbook_PJ2",
+        "r": "p.1"
+      }
+    ]
+  },
+  "changes": [
+    {
+      "what": "Runbook / Exploitation (OPS-601)",
+      "before": "Incomplet : étapes 4 (retour arrière TODO) et 5 (validation post-déploiement à compléter). Rien reçu au 29 sept. Condition GL-3 ouverte.",
+      "after": "Version finale et annexe A reçues le 1er oct. Étapes 4 et 5 complétées. Procédure de retour arrière documentée (exécutable sans l'équipe projet, durée 35 min). En cours d'évaluation par l'équipe d'Olivier (test prévu d'ici le 6 oct.) ; non encore approuvé.",
+      "sources": [
+        {
+          "s": "EVT-01_Courriel_Olivier_runbook",
+          "r": "L3-L7"
+        },
+        {
+          "s": "EVT-01_Courriel_Olivier_runbook_PJ1",
+          "r": "L7-L8"
+        },
+        {
+          "s": "EVT-01_Courriel_Olivier_runbook_PJ2",
+          "r": "p.1"
+        }
+      ]
+    }
+  ],
+  "affected": [
+    {
+      "ref": "topic:runbook",
+      "impact": "Passe de 'Incomplet' à 'Reçu, en cours de test par l'exploitation'. Le runbook final et l'annexe A de rollback ont été transmis par Boréal le 1er oct.",
+      "sources": [
+        {
+          "s": "EVT-01_Courriel_Olivier_runbook",
+          "r": "L3"
+        },
+        {
+          "s": "EVT-01_Courriel_Olivier_runbook_PJ2",
+          "r": "p.1"
+        }
+      ]
+    },
+    {
+      "ref": "GL-3",
+      "impact": "Statut mis à jour : les documents sont reçus, les étapes 4 et 5 sont complétées, mais l'approbation d'Olivier reste en attente du test par son équipe prévu d'ici le 6 oct.",
+      "sources": [
+        {
+          "s": "EVT-01_Courriel_Olivier_runbook",
+          "r": "L5-L7"
+        }
+      ]
+    },
+    {
+      "ref": "A-04",
+      "impact": "Statut passe de 'en retard' à 'terminé / livré le 1er oct.'. Les étapes 4 et 5 du runbook ont été fournies par Boréal.",
+      "sources": [
+        {
+          "s": "EVT-01_Courriel_Olivier_runbook",
+          "r": "L3"
+        }
+      ]
+    },
+    {
+      "ref": "A-05",
+      "impact": "Échéance précisée : Olivier prévoit de faire exécuter la procédure par son équipe d'ici le 6 octobre avant de donner son approbation.",
+      "sources": [
+        {
+          "s": "EVT-01_Courriel_Olivier_runbook",
+          "r": "L5"
+        }
+      ]
+    },
+    {
+      "ref": "RK-2",
+      "impact": "Atténué mais non fermé : le runbook et le rollback sont reçus et documentés, mais l'approbation formelle d'exploitation dépend du test d'ici le 6 oct.",
+      "sources": [
+        {
+          "s": "EVT-01_Courriel_Olivier_runbook",
+          "r": "L5-L7"
+        }
+      ]
+    },
+    {
+      "ref": "Q10",
+      "impact": "La réponse doit refléter la réception de la version finale du runbook et de l'annexe A le 1er oct., tout en maintenant que la condition GL-3 reste ouverte en attendant le test d'Olivier prévu d'ici le 6 oct.",
+      "sources": [
+        {
+          "s": "EVT-01_Courriel_Olivier_runbook",
+          "r": "L3-L7"
+        }
+      ]
+    }
+  ],
+  "unchanged": [
+    {
+      "ref": "GL-1",
+      "why": "Aucune nouvelle preuve de re-test ou d'acceptation sécurité de SEC-210 dans l'événement du 1er oct.",
+      "sources": [
+        {
+          "s": "SEC-210",
+          "r": "L25"
+        }
+      ]
+    },
+    {
+      "ref": "GL-2",
+      "why": "Aucune nouvelle preuve de livraison ou de fermeture du ticket ACC-303 dans l'événement du 1er oct.",
+      "sources": [
+        {
+          "s": "ACC-303",
+          "r": "L16"
+        }
+      ]
+    },
+    {
+      "ref": "topic:securite",
+      "why": "SEC-210 reste EN VALIDATION (non accepté).",
+      "sources": [
+        {
+          "s": "SEC-210",
+          "r": "L25"
+        }
+      ]
+    },
+    {
+      "ref": "topic:accessibilite",
+      "why": "ACC-303 reste OUVERT (bloquant).",
+      "sources": [
+        {
+          "s": "ACC-303",
+          "r": "L16"
+        }
+      ]
+    }
+  ],
+  "patch": {
+    "topics": [
+      {
+        "id": "runbook",
+        "title": "Exploitation — runbook (OPS-601)",
+        "level": "warn",
+        "status": "Version finale et annexe A reçues le 1er oct. — test en cours par l'exploitation (échéance 6 oct.)",
+        "summary": "Boréal a transmis le 1er oct. la version finale du runbook et l'annexe A (rollback). Olivier Côté évalue la procédure (test par un membre de son équipe d'ici le 6 oct.). Ce n'est pas encore une approbation, la condition GL-3 reste ouverte.",
+        "sources": [
+          {
+            "s": "OPS-601_runbook",
+            "r": "capture"
+          },
+          {
+            "s": "EVT-01_Courriel_Olivier_runbook",
+            "r": "L3-L7"
+          },
+          {
+            "s": "EVT-01_Courriel_Olivier_runbook_PJ2",
+            "r": "p.1"
+          }
+        ]
+      }
+    ],
+    "goLiveConditions": [
+      {
+        "id": "GL-3",
+        "title": "Approbation du runbook, incluant le retour arrière",
+        "approver": "Olivier Côté (exploitation)",
+        "status": "OUVERT ; version finale et annexe A reçues le 1er oct. ; test par un membre de l'équipe prévu d'ici le 6 oct. avant approbation",
+        "level": "warn",
+        "actions": [
+          "A-04",
+          "A-05"
+        ],
+        "sources": [
+          {
+            "s": "M06",
+            "r": "L10-L11"
+          },
+          {
+            "s": "EVT-01_Courriel_Olivier_runbook",
+            "r": "L3-L7"
+          },
+          {
+            "s": "EVT-01_Courriel_Olivier_runbook_PJ2",
+            "r": "p.1"
+          }
+        ]
+      }
+    ],
+    "actions": [
+      {
+        "id": "A-04",
+        "title": "Compléter le runbook : étape 4 (retour arrière) et étape 5 (validation fonctionnelle post-déploiement)",
+        "owner": "Boréal (équipe ops / Julien Moreau)",
+        "ownerStatus": "confirmé",
+        "due": "2026-10-01 (livré)",
+        "origin": "engagement documenté",
+        "condition": "GL-3",
+        "status": "terminé",
+        "sources": [
+          {
+            "s": "EVT-01_Courriel_Olivier_runbook",
+            "r": "L3"
+          },
+          {
+            "s": "EVT-01_Courriel_Olivier_runbook_PJ1",
+            "r": "L7-L8"
+          }
+        ]
+      },
+      {
+        "id": "A-05",
+        "title": "Faire exécuter la procédure de retour arrière par un membre de l'équipe et approuver le runbook",
+        "owner": "Olivier Côté",
+        "ownerStatus": "confirmé",
+        "due": "2026-10-06",
+        "origin": "engagement documenté",
+        "condition": "GL-3",
+        "status": "en cours",
+        "sources": [
+          {
+            "s": "EVT-01_Courriel_Olivier_runbook",
+            "r": "L5"
+          }
+        ]
+      }
+    ],
+    "answers": [
+      {
+        "id": "Q10",
+        "question": "Quelles sont les trois conditions de go-live? Précisez les travaux manquants du runbook à partir de sa capture.",
+        "short": "(1) Validation sécurité de SEC-210, (2) fermeture d'ACC-303, (3) approbation du runbook incluant le retour arrière. Concernant le runbook, Boréal a transmis la version finale et l'annexe A le 1er oct. ; les étapes 4 et 5 sont complétées et la procédure de rollback est documentée, mais l'approbation d'Olivier est en attente du test par son équipe d'ici le 6 oct.",
+        "detail": "Les trois conditions ont été formulées par Nicolas et confirmées par Sophie, Mélissa et Olivier le 26 sept. (M06 L11-L14). Runbook final reçu le 1er oct. (EVT-01 L3) : les étapes 4 (procédure de retour arrière) et 5 (validation fonctionnelle post-déploiement) sont complétées (EVT-01_PJ1). L'annexe A détaille la procédure de retour arrière en 5 étapes (estimation 35 min, exécutable sans l'équipe projet) (EVT-01_PJ2). Olivier doit faire exécuter la procédure par un membre de son équipe d'ici le 6 oct. avant de donner son approbation (EVT-01 L5). Responsables : Sophie (GL-1), Boréal puis Mélissa (GL-2), Boréal ops et Olivier (GL-3).",
+        "sources": [
+          {
+            "s": "M06",
+            "r": "L11-L14"
+          },
+          {
+            "s": "EVT-01_Courriel_Olivier_runbook",
+            "r": "L3-L7"
+          },
+          {
+            "s": "EVT-01_Courriel_Olivier_runbook_PJ1",
+            "r": "L7-L8"
+          },
+          {
+            "s": "EVT-01_Courriel_Olivier_runbook_PJ2",
+            "r": "p.1"
+          }
+        ]
+      }
+    ],
+    "risks": [
+      {
+        "id": "RK-1",
+        "rank": 1,
+        "title": "Deux des trois conditions de go-live sont encore ouvertes, et SEC-210 n'a pas de date de re-test",
+        "level": "élevé",
+        "why": "SEC-210 n'est pas accepté et ACC-303 est ouvert. Le runbook (GL-3) a été transmis le 1er oct. mais son approbation est suspendue au test prévu d'ici le 6 oct.",
+        "mitigation": "A-01, A-02, A-03, A-05, A-13",
+        "sources": [
+          {
+            "s": "M06",
+            "r": "L11-L16"
+          },
+          {
+            "s": "EVT-01_Courriel_Olivier_runbook",
+            "r": "L5-L7"
+          }
+        ]
+      },
+      {
+        "id": "RK-2",
+        "rank": 2,
+        "title": "Exploitation : validation du runbook et du retour arrière en attente du test pratique",
+        "level": "moyen",
+        "why": "Le runbook final et l'annexe A ont été transmis le 1er oct., mais Olivier attend l'exécution par un membre de son équipe (prévue d'ici le 6 oct.) pour donner son go.",
+        "mitigation": "A-05",
+        "sources": [
+          {
+            "s": "EVT-01_Courriel_Olivier_runbook",
+            "r": "L5-L7"
+          }
+        ]
+      }
+    ],
+    "missing": [
+      {
+        "title": "Résultat du test du runbook par l'équipe d'Olivier",
+        "detail": "Prévu d'ici le 6 octobre 2026.",
+        "sources": [
+          {
+            "s": "EVT-01_Courriel_Olivier_runbook",
+            "r": "L5"
+          }
+        ]
+      }
+    ],
+    "decisions": [],
+    "contradictions": [],
+    "timeline": [
+      {
+        "date": "2026-10-01",
+        "type": "livraison",
+        "topic": "runbook",
+        "title": "Boréal transmet le runbook final et l'annexe A (rollback)",
+        "sources": [
+          {
+            "s": "EVT-01_Courriel_Olivier_runbook",
+            "r": "L3"
+          },
+          {
+            "s": "EVT-01_Courriel_Olivier_runbook_PJ2",
+            "r": "p.1"
+          }
+        ]
+      }
+    ],
+    "brief": {
+      "title": "Brief de reprise — NOVA après U1 (1er oct. 2026)",
+      "sections": [
+        {
+          "theme": "Responsable",
+          "text": "Nicolas Perron, chargé de projet depuis le 16 sept. 2026 (Élodie Caron avant lui).",
+          "sources": [
+            {
+              "s": "E06",
+              "r": "L3"
+            }
+          ]
+        },
+        {
+          "theme": "Date approuvée et conditions",
+          "text": "22 oct. 2026, approuvée par le comité de direction le 10 sept. (proposée par Boréal le 8 sept.). Ce n'est PAS un go garanti : trois conditions restent ouvertes, à savoir la validation sécurité de SEC-210, la fermeture d'ACC-303 et l'approbation du runbook (reçu le 1er oct., test par l'équipe d'Olivier prévu d'ici le 6 oct.).",
+          "sources": [
+            {
+              "s": "M04",
+              "r": "L17-L23"
+            },
+            {
+              "s": "M06",
+              "r": "L11-L16"
+            },
+            {
+              "s": "EVT-01_Courriel_Olivier_runbook",
+              "r": "L3-L7"
+            }
+          ]
+        },
+        {
+          "theme": "Portée",
+          "text": "Phase 1 : SSO, création et suivi de demandes, pièces jointes, workflow, tableau de suivi, rapports standards, plus rapports avancés (CR-01). Le mobile avancé (CR-04) est reporté en phase 2 et n'est pas approuvé. Les données de production sont dans Canada Central (ADR-007).",
+          "sources": [
+            {
+              "s": "CONTRAT_Boreal_NOVA",
+              "r": "p.1"
+            },
+            {
+              "s": "Decision_Portee_Phase2",
+              "r": "L4"
+            },
+            {
+              "s": "ADR-007_Localisation_donnees",
+              "r": "L10"
+            }
+          ]
+        },
+        {
+          "theme": "Budget",
+          "text": "Autorisé : 204 000 $ (180 000 $ du contrat + 24 000 $ de CR-01). Payé : 132 000 $. En validation : 54 000 $. Contrat jusqu'au 31 oct.",
+          "sources": [
+            {
+              "s": "CONTRAT_Boreal_NOVA",
+              "r": "p.1"
+            },
+            {
+              "s": "CR-01_Rapports_avances_APPROUVE",
+              "r": "p.1"
+            }
+          ]
+        },
+        {
+          "theme": "Factures",
+          "text": "INV-001 (60 000 $) et INV-002 (72 000 $) sont payées. INV-003 (54 000 $) est bloquée : sa ligne de 18 000 $ pour CR-04 n'est pas autorisée. Il faut demander une facture corrigée et ne traiter que les 36 000 $ du jalon 3.",
+          "sources": [
+            {
+              "s": "INV-003",
+              "r": "p.1"
+            },
+            {
+              "s": "E07",
+              "r": "L5"
+            }
+          ]
+        },
+        {
+          "theme": "Priorités",
+          "text": "1) Obtenir la date du re-test SEC-210 (Sophie). 2) Obtenir la date de la build ACC-303 de Boréal, puis le re-test de Mélissa. 3) Suivre le test pratique du runbook par l'équipe d'Olivier (prévu d'ici le 6 oct.) en vue de son approbation. 4) Répondre aux Finances sur INV-003. 5) Corriger le plan v3, le registre (R-01), le rapport de statut et le brouillon de communication « au vert ».",
+          "sources": [
+            {
+              "s": "M06",
+              "r": "L11-L15"
+            },
+            {
+              "s": "EVT-01_Courriel_Olivier_runbook",
+              "r": "L5"
+            },
+            {
+              "s": "E11",
+              "r": "L5"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "_retiresDuPatch": {
+    "GL-1": "déclaré inchangé par le brouillon",
+    "GL-2": "identique au baseline",
+    "A-01": "ne cite pas la nouvelle source",
+    "A-02": "identique au baseline",
+    "A-03": "identique au baseline",
+    "A-06": "ne cite pas la nouvelle source",
+    "A-07": "identique au baseline",
+    "A-08": "ne cite pas la nouvelle source",
+    "A-09": "ne cite pas la nouvelle source",
+    "A-10": "ne cite pas la nouvelle source",
+    "A-11": "identique au baseline",
+    "A-12": "identique au baseline",
+    "A-13": "identique au baseline",
+    "RK-3": "identique au baseline",
+    "RK-4": "identique au baseline",
+    "Date du re-test sécurité de SEC-210": "identique au baseline",
+    "Date de la « prochaine build » avec le correctif ACC-303": "identique au baseline",
+    "Acceptation du livrable « jalon 3 » (36 000 $)": "identique au baseline",
+    "Réponse de Nicolas aux Finances (E07) et statut final d'INV-003": "identique au baseline",
+    "Instance et date de la décision finale go/no-go": "identique au baseline",
+    "Plan si la date glisse au-delà du 31 oct. (fin du contrat)": "identique au baseline",
+    "Vérification de la journalisation admin « en situation réelle »": "identique au baseline"
+  }
+}

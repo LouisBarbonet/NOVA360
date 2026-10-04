@@ -130,6 +130,8 @@ Réponse en 10 à 30 secondes. Vérifiez : la justesse, les citations cliquables
 
 ## 7. Arrivée d'un nouvel événement (≈ 10 min ; 1 analyse = 1 à 3 requêtes Gemini)
 
+> Variante « fichiers » : téléversez plutôt `repetitions/repetition-2/Courriel_Olivier_runbook.eml` (courriel avec une capture et un PDF en pièces jointes). Attendu : 3 sources ingérées (courriel, PJ1 capture transcrite « à relire », PJ2 PDF), GL-3 **reste ouvert** (runbook reçu mais pas approuvé), GL-1 et GL-2 inchangés, brief révisé sur une page.
+
 1. Page **Mise à jour** → titre : `TEST Sophie 2 octobre` → collez ce texte :
 
    ```

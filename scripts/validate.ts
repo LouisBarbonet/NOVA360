@@ -11,7 +11,7 @@ const corpus: { sources: Src[] } = JSON.parse(readFileSync("data/corpus.json", "
 const byId = new Map(corpus.sources.map((s) => [s.id, s]));
 
 export function resolveRef(src: Src, ref: string): boolean {
-  if (ref === "capture") return src.ext === ".png" && src.segments.length > 0;
+  if (ref === "capture") return [".png", ".jpg", ".jpeg"].includes(src.ext) && src.segments.length > 0;
   const range = ref.match(/^L(\d+)(?:-L(\d+))?$/);
   if (range) {
     const has = (n: string) => src.segments.some((g) => g.ref === `L${n}`);

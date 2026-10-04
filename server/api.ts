@@ -2,9 +2,10 @@
 import type { Plugin } from "vite";
 import type { IncomingMessage, ServerResponse } from "node:http";
 import { readFileSync, readdirSync, writeFileSync, mkdirSync, existsSync } from "node:fs";
-import { join } from "node:path";
+import { dirname, join } from "node:path";
 import { execFileSync } from "node:child_process";
-import { assertConfigured, complete } from "./llm";
+import { jsonrepair } from "jsonrepair";
+import { assertConfigured, complete, transcribeImage } from "./llm";
 import { RULES, chatTurns, corpusText as buildCorpusText, knowledge, memoryText as buildMemoryText } from "./prompt";
 
 const CORPUS = "data/corpus.json";
@@ -65,7 +66,8 @@ const IMPACT_SCHEMA = `{
     "topics": [ <objets topic COMPLETS du baseline, modifiés, même id> ],
     "goLiveConditions": [ ... ], "actions": [ <actions modifiées (même id) ou nouvelles (id A-14+), mêmes champs que le baseline> ],
     "answers": [ <réponses Q01–Q10 modifiées, objets complets> ], "risks": [ ... ], "missing": [ ... ], "decisions": [ ... ], "contradictions": [ ... ],
-    "timeline": [ { "date": "YYYY-MM-DD", "type": "proposition|décision|livraison|validation|risque|fait", "topic": "<id de topic>", "title": "...", "sources": [...] } ]
+    "timeline": [ { "date": "YYYY-MM-DD", "type": "proposition|décision|livraison|validation|risque|fait", "topic": "<id de topic>", "title": "...", "sources": [...] } ],
+    "brief": { "title": "Brief de reprise — NOVA après <U<n>> (<date>)", "sections": [ <les 6 thèmes du brief du baseline, DANS LE MÊME ORDRE (Responsable, Date approuvée et conditions, Portée, Budget, Factures, Priorités) : recopie les thèmes inchangés, réécris ceux que l'événement modifie ; même longueur qu'au baseline (le brief doit tenir sur une page) ; chaque thème cite ses sources> ] }
   }
 }`;
 
@@ -75,17 +77,41 @@ function newEventSources(): Src[] {
   return corpus.sources.filter((s) => s.folder === "09_Nouvel_evenement" && !used.includes(`"s":"${s.id}"`) && !used.includes(`"s": "${s.id}"`));
 }
 
-async function ingestEvent(body: { title: string; text?: string }) {
-  assertConfigured(); // échoue avant toute écriture si la clé manque
-  if (body.text?.trim()) {
-    mkdirSync(EVENT_DIR, { recursive: true });
-    const slug = body.title.normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^A-Za-z0-9]+/g, "_").replace(/^_|_$/g, "").slice(0, 50);
-    const n = existsSync(EVENT_DIR) ? readdirSync(EVENT_DIR).length + 1 : 1;
-    writeFileSync(join(EVENT_DIR, `EVT-${String(n).padStart(2, "0")}_${slug}.txt`), body.text.trim() + "\n", "utf8");
+const runExtract = () => execFileSync(process.execPath, ["node_modules/tsx/dist/cli.mjs", "scripts/extract.ts"], { stdio: "pipe" });
+const safeName = (name: string) => name.normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^A-Za-z0-9._-]+/g, "_").replace(/^_+|_+$/g, "").slice(0, 80);
+
+/** Fait transcrire par le LLM (vision) les images encore sans transcription, puis relance l'extraction. */
+async function transcribePending(): Promise<string[]> {
+  const corpus = JSON.parse(readFileSync(CORPUS, "utf8")) as { pendingTranscriptions?: { id: string; raw: string; sidecar: string }[] };
+  const done: string[] = [];
+  for (const p of corpus.pendingTranscriptions ?? []) {
+    const mime = p.raw.toLowerCase().endsWith(".png") ? "image/png" : "image/jpeg";
+    const text = await transcribeImage(readFileSync(p.raw), mime);
+    mkdirSync(dirname(p.sidecar), { recursive: true });
+    writeFileSync(p.sidecar, `[Transcription automatique (LLM) — à relire]\n${text.trim()}\n`, "utf8");
+    done.push(p.id);
   }
-  execFileSync(process.execPath, ["node_modules/tsx/dist/cli.mjs", "scripts/extract.ts"], { stdio: "pipe" });
+  if (done.length) runExtract();
+  return done;
+}
+
+async function ingestEvent(body: { title: string; text?: string; files?: { name: string; data: string }[] }) {
+  assertConfigured(); // échoue avant toute écriture si la clé manque
+  mkdirSync(EVENT_DIR, { recursive: true });
+  let n = readdirSync(EVENT_DIR).length;
+  const prefix = () => `EVT-${String(++n).padStart(2, "0")}`;
+  if (body.text?.trim()) {
+    const slug = safeName(body.title || "evenement").replace(/\./g, "_").slice(0, 50);
+    writeFileSync(join(EVENT_DIR, `${prefix()}_${slug}.txt`), body.text.trim() + "\n", "utf8");
+  }
+  // Fichiers téléversés depuis l'interface (n'importe quel format du corpus : eml, pdf, xlsx, png, txt, md, csv)
+  for (const f of body.files ?? []) {
+    writeFileSync(join(EVENT_DIR, `${prefix()}_${safeName(f.name)}`), Buffer.from(f.data, "base64"));
+  }
+  runExtract();
+  const transcribed = await transcribePending();
   const fresh = newEventSources();
-  if (!fresh.length) throw Object.assign(new Error("Aucune nouvelle source dans 09_Nouvel_evenement (collez un texte ou déposez un fichier, puis réessayez)."), { status: 400 });
+  if (!fresh.length) throw Object.assign(new Error("Aucune nouvelle source dans 09_Nouvel_evenement (collez un texte ou ajoutez un fichier, puis réessayez)."), { status: 400 });
 
   const nextVersion = `U${updateFiles().length + 1}`;
   const eventText = fresh.map((s) => `##### ${s.id} (${s.path})\n${s.segments.map((g) => `${g.ref}\t${g.text}`).join("\n")}`).join("\n\n");
@@ -117,11 +143,11 @@ ${IMPACT_SCHEMA}`,
   const raw = out.text;
   let draft: unknown;
   try {
-    draft = pruneUnchanged(parseLenient(raw) as Record<string, unknown>);
+    draft = pruneUnchanged(parseLenient(raw) as Record<string, unknown>, fresh.map((s) => s.id));
   } catch {
     draft = { version: nextVersion, _erreur: "Le modèle n'a pas produit de JSON valide : corrigez à la main.", brut: raw };
   }
-  return { sourceId: fresh.map((s) => s.id).join(", "), provider: out.provider, model: out.model, draft };
+  return { sourceId: fresh.map((s) => s.id).join(", "), sources: fresh.map((s) => ({ id: s.id, segments: s.segments.length })), transcribed, provider: out.provider, model: out.model, draft };
 }
 
 /** JSON du LLM : texte autour ignoré, puis réparation des fautes courantes (clé sans guillemets, virgule finale). */
@@ -130,32 +156,40 @@ export function parseLenient(raw: string): unknown {
   try {
     return JSON.parse(json);
   } catch {
-    const repaired = json
-      .replace(/([{,]\s*)([A-Za-z_][\w-]*)\s*:/g, '$1"$2":')
-      .replace(/,(\s*[}\]])/g, "$1");
-    return JSON.parse(repaired);
+    // Fautes typiques des LLM (guillemet manquant, clé nue, virgule finale, texte autour) : réparation dédiée
+    return JSON.parse(jsonrepair(json));
   }
 }
 
-/** Retire du patch les éléments identiques au baseline : seuls les vrais changements seront signalés « modifié ». */
-export function pruneUnchanged(draft: Record<string, unknown>): Record<string, unknown> {
+/**
+ * Garde-fous déterministes sur le brouillon du LLM :
+ * 1. un élément identique au baseline est retiré (il ne serait pas un changement) ;
+ * 2. un élément déclaré « inchangé » par le brouillon lui-même ne peut pas être modifié ;
+ * 3. un élément modifié doit citer la nouvelle source : sinon, rien dans l'événement ne justifie le changement.
+ * Chaque retrait est listé avec sa raison, pour la relecture humaine.
+ */
+export function pruneUnchanged(draft: Record<string, unknown>, freshIds: string[] = []): Record<string, unknown> {
   const baseline = JSON.parse(readFileSync(join(MEMORY, "baseline.json"), "utf8")) as Record<string, unknown>;
   const patch = (draft.patch ?? {}) as Record<string, unknown>;
+  const declaredUnchanged = new Set(((draft.unchanged ?? []) as { ref?: string }[]).map((u) => String(u.ref ?? "").trim()));
   const same = (a: Record<string, unknown>, b: Record<string, unknown>) =>
     Object.keys(a).every((k) => k.startsWith("_") || JSON.stringify(a[k]) === JSON.stringify(b[k]));
-  const pruned: string[] = [];
+  // JSON.stringify ne met pas d'espaces : la citation de la nouvelle source s'écrit exactement "s":"<id>"
+  const citesEvent = (it: unknown) => freshIds.some((id) => JSON.stringify(it).includes(`"s":${JSON.stringify(id)}`));
+  const removed: Record<string, string> = {};
   for (const [key, items] of Object.entries(patch)) {
     const base = baseline[key];
     if (key === "timeline" || !Array.isArray(items) || !Array.isArray(base)) continue;
     patch[key] = items.filter((it: Record<string, unknown>) => {
-      const k = it.id ?? it.title;
-      const b = (base as Record<string, unknown>[]).find((x) => (x.id ?? x.title) === k);
-      const unchanged = !!b && same(it, b);
-      if (unchanged) pruned.push(String(k));
-      return !unchanged;
+      const k = String(it.id ?? it.title);
+      const b = (base as Record<string, unknown>[]).find((x) => String(x.id ?? x.title) === k);
+      if (b && same(it, b)) removed[k] = "identique au baseline";
+      else if (declaredUnchanged.has(k)) removed[k] = "déclaré inchangé par le brouillon";
+      else if (freshIds.length && !citesEvent(it)) removed[k] = "ne cite pas la nouvelle source";
+      return !(k in removed);
     });
   }
-  return { ...draft, patch, ...(pruned.length ? { _retiresCarInchanges: pruned } : {}) };
+  return { ...draft, patch, ...(Object.keys(removed).length ? { _retiresDuPatch: removed } : {}) };
 }
 
 function saveUpdate(raw: string) {

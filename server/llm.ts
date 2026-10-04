@@ -91,48 +91,113 @@ async function claude(model: string, opts: { rules: string; knowledge: string; m
 }
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
-// Surcharge temporaire côté Google (503/500) : on réessaie, puis on bascule sur un modèle de repli
 const isOverloaded = (e: unknown) => e instanceof ApiError && (e.status === 503 || e.status === 500);
+const isQuota = (e: unknown) => e instanceof ApiError && e.status === 429;
+
+/**
+ * Échelle de modèles Gemini : le modèle demandé, puis des modèles de repli DISTINCTS.
+ * Sur le palier gratuit, le quota (ex. 20 requêtes/jour) est compté par modèle : changer de modèle redonne du quota.
+ * - surcharge (503/500) : 1 nouvelle tentative sur le même modèle, puis modèle suivant ;
+ * - quota épuisé (429) : modèle suivant immédiatement.
+ */
+function geminiLadder(model: string): string[] {
+  const fallbacks = (process.env.GEMINI_FALLBACK_MODELS || process.env.GEMINI_FALLBACK_MODEL || "gemini-flash-lite-latest,gemini-2.5-flash-lite,gemini-3.1-flash-lite")
+    .split(",")
+    .map((m) => m.trim())
+    .filter(Boolean);
+  return [...new Set([model, ...fallbacks])];
+}
+
+async function withGemini<T>(model: string, call: (m: string) => Promise<T>): Promise<{ value: T; model: string }> {
+  const ladder = geminiLadder(model);
+  let last: unknown;
+  for (const m of ladder) {
+    for (let attempt = 0; attempt < 2; attempt++) {
+      try {
+        return { value: await call(m), model: m };
+      } catch (e) {
+        last = e;
+        if (isOverloaded(e) && attempt === 0) {
+          await sleep(2000);
+          continue;
+        }
+        if (isOverloaded(e) || isQuota(e)) break; // modèle suivant
+        // 404 : modèle introuvable sur ce compte → on essaie le suivant ; autre erreur → arrêt
+        if (e instanceof ApiError && e.status === 404) break;
+        throw geminiError(e, m);
+      }
+    }
+  }
+  throw geminiError(last, ladder.join(" → "));
+}
+
+function geminiError(e: unknown, models: string): Error {
+  if (isQuota(e)) return httpError(`Quota gratuit Gemini épuisé pour tous les modèles essayés (${models}). Réessayez plus tard, ou passez NOVA_PROVIDER=claude dans .env.`, 429);
+  if (isOverloaded(e)) return httpError(`Gemini est surchargé en ce moment (${models}). Réessayez dans une minute, ou passez NOVA_PROVIDER=claude dans .env.`, 503);
+  if (e instanceof ApiError && (e.status === 401 || e.status === 403 || /API key not valid/i.test(e.message))) {
+    return httpError("Clé Gemini refusée : vérifiez GEMINI_API_KEY dans .env (clé créée sur aistudio.google.com).", 401);
+  }
+  if (e instanceof ApiError && e.status === 404) {
+    return httpError(`Modèle Gemini introuvable (${models}). Listez les modèles disponibles avec npm run gemini:models, puis réglez GEMINI_MODEL dans .env.`, 400);
+  }
+  return e instanceof Error ? e : new Error(String(e));
+}
 
 async function gemini(model: string, opts: { rules: string; knowledge: string; maxTokens: number; json?: boolean }, turns: Turn[]): Promise<Completion> {
   const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
-  const fallback = process.env.GEMINI_FALLBACK_MODEL || "gemini-flash-lite-latest";
-  const attempts = [model, model, model, ...(fallback !== model ? [fallback] : [])];
-  try {
-    for (let i = 0; ; i++) {
-      const current = attempts[i];
-      try {
-        const res = await ai.models.generateContent({
-          model: current,
-          contents: turns.map((t) => ({ role: t.role === "assistant" ? "model" : "user", parts: [{ text: t.content }] })),
-          config: {
-            systemInstruction: `${opts.rules}\n\n${opts.knowledge}`,
-            maxOutputTokens: opts.maxTokens,
-            // Mode JSON natif de Gemini : sortie garantie syntaxiquement valide
-            ...(opts.json ? { responseMimeType: "application/json" } : {}),
-          },
-        });
-        const text = res.text;
-        if (!text) throw httpError(`Gemini n'a renvoyé aucun texte (motif : ${res.candidates?.[0]?.finishReason ?? "inconnu"}).`, 502);
-        return { text, provider: "gemini", model: current };
-      } catch (e) {
-        if (!isOverloaded(e) || i === attempts.length - 1) throw e;
-        await sleep(2000 * (i + 1));
-      }
-    }
-  } catch (e) {
-    if (isOverloaded(e)) {
-      throw httpError(`Gemini est surchargé en ce moment (${model} puis ${fallback}). Réessayez dans une minute, ou passez NOVA_PROVIDER=claude dans .env.`, 503);
-    }
-    if (e instanceof ApiError && e.status === 429) {
-      throw httpError("Quota gratuit Gemini atteint (requêtes par minute ou par jour). Réessayez plus tard, ou passez NOVA_PROVIDER=claude dans .env.", 429);
-    }
-    if (e instanceof ApiError && (e.status === 401 || e.status === 403 || /API key not valid/i.test(e.message))) {
-      throw httpError("Clé Gemini refusée : vérifiez GEMINI_API_KEY dans .env (clé créée sur aistudio.google.com).", 401);
-    }
-    if (e instanceof ApiError && e.status === 404) {
-      throw httpError(`Modèle Gemini introuvable : « ${model} ». Listez les modèles disponibles avec npm run gemini:models, puis réglez GEMINI_MODEL dans .env.`, 400);
-    }
-    throw e;
+  const { value, model: used } = await withGemini(model, async (m) => {
+    const res = await ai.models.generateContent({
+      model: m,
+      contents: turns.map((t) => ({ role: t.role === "assistant" ? "model" : "user", parts: [{ text: t.content }] })),
+      config: {
+        systemInstruction: `${opts.rules}\n\n${opts.knowledge}`,
+        maxOutputTokens: opts.maxTokens,
+        // Mode JSON natif de Gemini : sortie garantie syntaxiquement valide
+        ...(opts.json ? { responseMimeType: "application/json" } : {}),
+      },
+    });
+    if (!res.text) throw httpError(`Gemini n'a renvoyé aucun texte (motif : ${res.candidates?.[0]?.finishReason ?? "inconnu"}).`, 502);
+    return res.text;
+  });
+  return { text: value, provider: "gemini", model: used };
+}
+
+const TRANSCRIBE_PROMPT = `Transcris fidèlement cette capture d'écran en français, comme preuve pour un dossier de projet.
+Format : une information par ligne, dans l'ordre de lecture.
+- Commence par « Bandeau : … » (titre de l'application, version, URL) et « Titre de page : … » s'ils existent.
+- Recopie mot pour mot les textes, tableaux (une ligne par rangée, colonnes séparées par « | »), statuts et valeurs (OK, TODO, dates, montants).
+- Décris brièvement les éléments visuels qui portent du sens (encadré rouge, texte barré, couleur d'un statut).
+- N'interprète pas, ne résume pas, n'ajoute rien qui ne soit pas visible. Si un texte est illisible, écris [illisible].`;
+
+/** Transcription d'une image (LLM vision) ; marquée « à relire » par l'appelant. */
+export async function transcribeImage(data: Buffer, mimeType: "image/png" | "image/jpeg"): Promise<string> {
+  assertConfigured();
+  const model = modelFor("impact");
+  if (provider() === "claude") {
+    const msg = await new Anthropic().messages.create({
+      model,
+      max_tokens: 2000,
+      messages: [
+        {
+          role: "user",
+          content: [
+            { type: "image", source: { type: "base64", media_type: mimeType, data: data.toString("base64") } },
+            { type: "text", text: TRANSCRIBE_PROMPT },
+          ],
+        },
+      ],
+    });
+    return msg.content.map((b) => (b.type === "text" ? b.text : "")).join("");
   }
+  const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+  const { value } = await withGemini(model, async (m) => {
+    const res = await ai.models.generateContent({
+      model: m,
+      contents: [{ role: "user", parts: [{ inlineData: { mimeType, data: data.toString("base64") } }, { text: TRANSCRIBE_PROMPT }] }],
+      config: { maxOutputTokens: 2000 },
+    });
+    if (!res.text) throw httpError("Transcription vide.", 502);
+    return res.text;
+  });
+  return value;
 }

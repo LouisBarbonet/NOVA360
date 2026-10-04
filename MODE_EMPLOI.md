@@ -33,22 +33,28 @@ Mémoire opérationnelle du projet NOVA, établie à partir des 64 fichiers du c
 
 ## Intégrer un nouvel événement
 
-1. Page **Mise à jour** : coller le texte de l'événement, ou déposer le fichier dans `NOVA_ETUDIANTS/Projet360_NOVA_ETUDIANTS/09_Nouvel_evenement/`.
-2. L'événement est extrait comme une nouvelle source, puis le LLM rédige un **brouillon** : ce qui change (avant/après), ce qui est affecté, ce qui ne change pas, et les actions à prendre.
-3. L'équipe **relit et corrige** le JSON (aucune approbation inventée, aucune autre condition fermée), puis l'enregistre comme `data/memory/updates/U<n>.json`.
-4. Le **baseline n'est jamais modifié**. Le sélecteur de version permet de comparer l'avant et l'après.
+1. Page **Mise à jour** (en local, `npm run dev`) : coller le texte de l'événement **ou** téléverser un ou plusieurs fichiers (glisser-déposer), dans n'importe quel format du corpus : .eml, .pdf, .xlsx, .png/.jpg, .txt, .md, .csv.
+2. Extraction automatique :
+   - les **pièces jointes** d'un courriel absentes du corpus deviennent des sources citables (ex. `EVT-01_…_PJ1`) ; celles déjà présentes sont reliées au fichier existant ;
+   - les **captures d'écran** sont transcrites par le LLM (vision). La transcription est marquée « transcription automatique, **à relire** » et doit être comparée à l'image avant validation.
+3. Le LLM rédige un **brouillon** d'impact : ce qui change (avant / après), ce qui est affecté, ce qui ne change pas, les actions touchées et un **brief révisé**.
+4. **Garde-fous automatiques** appliqués au brouillon, avant la relecture humaine :
+   - JSON réparé si besoin ;
+   - retrait de tout élément identique au baseline, déclaré « inchangé », ou modifié **sans citer la nouvelle source**. Chaque retrait est listé avec sa raison (`_retiresDuPatch`).
+5. L'équipe **relit et corrige** le JSON (aucune approbation inventée, aucune autre condition fermée sans preuve), puis l'enregistre : les citations sont revalidées automatiquement.
+6. Le **baseline n'est jamais modifié**. Le sélecteur de version compare l'avant et l'après. Dans le brief, les thèmes réécrits sont marqués « révisé · U1 », sous un encadré qui résume les changements.
 
 ## Outils utilisés
 
 - **Claude Code (Claude Opus 5.5)** : lecture du corpus, transcription des 8 captures d'écran, rédaction de la mémoire de référence, développement.
 - **Claude Haiku 4.5** (API, configurable via `NOVA_MODEL`) : chat en langage naturel. Le corpus complet et la mémoire sont envoyés en contexte avec mise en cache ; il n'y a pas de base vectorielle.
 - **Claude Sonnet 5.5** (configurable via `NOVA_IMPACT_MODEL`) : brouillon d'analyse d'impact d'un nouvel événement.
-- **Google Gemini Flash** (secours, palier gratuit, `NOVA_PROVIDER=gemini`) : même rôle que Claude pour le chat et l'impact, sans mise en cache ; le corpus est renvoyé à chaque question.
+- **Google Gemini Flash** (secours, palier gratuit, `NOVA_PROVIDER=gemini`) : même rôle que Claude pour le chat, l'analyse d'impact et la transcription des captures. Le quota gratuit est compté **par modèle** (ex. 20 requêtes par jour) : en cas de quota épuisé ou de surcharge, l'application bascule automatiquement sur les modèles de repli (`GEMINI_FALLBACK_MODELS`).
 - **unpdf** (PDF), **SheetJS/xlsx** (Excel), décodeur MIME maison (courriels), **MiniSearch** (recherche), **Vite + TypeScript** (application).
 
 ## Traitements manuels
 
-- **Transcription des captures** (`data/transcriptions/`) : faite par lecture d'image, puis relue. Elle est signalée « transcription manuelle » dans la visionneuse.
+- **Transcription des captures** (`data/transcriptions/`) : les 8 captures du corpus initial ont été transcrites par lecture d'image, puis relues (« transcription manuelle »). Les captures d'un nouvel événement sont transcrites automatiquement par le LLM et signalées « à relire ».
 - **Curation de la mémoire** (`data/memory/baseline.json`) : rédigée avec Claude, puis relue par l'équipe contre les sources.
 - **Contrôles automatiques** : `npm run validate` vérifie que chacune des citations pointe vers un passage réel du corpus ; `npm test` vérifie le rendu de toutes les pages et la cohérence des montants.
 

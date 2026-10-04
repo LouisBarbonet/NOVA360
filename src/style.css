@@ -211,3 +211,7 @@ button { font: inherit; padding: .5rem .9rem; border-radius: 8px; border: 1px so
 .update-banner p, .update-banner ul { margin: .3rem 0; }
 @media print { .update-banner { padding: .3rem .5rem; font-size: 10px; } }
 .cache-tag { margin-top: .4rem; font-size: .78rem; color: var(--ok); }
+.dropzone { border: 2px dashed var(--line); border-radius: 8px; padding: .7rem; cursor: pointer; }
+.dropzone:hover { border-color: var(--accent); }
+.dropzone input { margin-top: .4rem; }
+dd.changed { outline: 2px solid var(--changed); outline-offset: 2px; border-radius: 3px; }

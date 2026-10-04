@@ -156,17 +156,53 @@ function bindEventForm() {
   const save = document.getElementById("event-save") as HTMLFormElement | null;
   const status = document.getElementById("event-status");
   if (!form || !save || !status) return;
+  const input = form.querySelector<HTMLInputElement>('input[type="file"]')!;
+  const list = document.getElementById("event-files")!;
+  const drop = document.getElementById("event-drop")!;
+  const showFiles = () => (list.textContent = [...(input.files ?? [])].map((f) => `${f.name} (${Math.ceil(f.size / 1024)} Ko)`).join(" · "));
+  input.addEventListener("change", showFiles);
+  drop.addEventListener("dragover", (e) => e.preventDefault());
+  drop.addEventListener("drop", (e) => {
+    e.preventDefault();
+    if (e.dataTransfer?.files.length) {
+      input.files = e.dataTransfer.files;
+      showFiles();
+    }
+  });
+  const toBase64 = (f: File) =>
+    new Promise<string>((ok, ko) => {
+      const r = new FileReader();
+      r.onload = () => ok(String(r.result).split(",")[1] ?? "");
+      r.onerror = () => ko(r.error);
+      r.readAsDataURL(f);
+    });
+
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
     const fd = new FormData(form);
-    status.textContent = "Ingestion et analyse d'impact en cours (≈ 30 s)…";
-    const res = await fetch("api/event", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(Object.fromEntries(fd)) });
+    const files = await Promise.all([...(input.files ?? [])].map(async (f) => ({ name: f.name, data: await toBase64(f) })));
+    if (!String(fd.get("text") ?? "").trim() && !files.length) {
+      status.textContent = "⚠ Collez un texte ou ajoutez au moins un fichier.";
+      return;
+    }
+    status.textContent = `Ingestion${files.some((f) => /.(png|jpe?g)$/i.test(f.name)) ? ", transcription des captures" : ""} et analyse d'impact en cours (≈ 30 à 90 s)…`;
+    const res = await fetch("api/event", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ title: fd.get("title"), text: fd.get("text"), files }),
+    });
     const data = await res.json();
     if (!res.ok) {
       status.textContent = `⚠ ${data.error}`;
       return;
     }
-    status.innerHTML = `Source ingérée : <a href="#/source/${encodeURIComponent(data.sourceId)}">${esc(data.sourceId)}</a>. Relisez le brouillon ci-dessous : aucune approbation ne doit être inventée.`;
+    const sources = (data.sources as { id: string; segments: number }[])
+      .map((s) => `<a href="#/source/${encodeURIComponent(s.id)}">${esc(s.id)}</a> (${s.segments} segments)`)
+      .join(" · ");
+    const auto = (data.transcribed as string[]).length
+      ? `<br>⚠ Captures transcrites automatiquement, <strong>à relire</strong> avant de valider : ${(data.transcribed as string[]).map((id) => `<a href="#/source/${encodeURIComponent(id)}">${esc(id)}</a>`).join(" · ")}`
+      : "";
+    status.innerHTML = `Sources ingérées : ${sources}.${auto}<br>Relisez le brouillon ci-dessous : aucune approbation inventée, aucune autre condition fermée sans preuve.`;
     save.hidden = false;
     (save.elements.namedItem("json") as HTMLTextAreaElement).value = JSON.stringify(data.draft, null, 2);
   });
