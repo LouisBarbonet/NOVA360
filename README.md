@@ -32,3 +32,5 @@ Défi Loto-Québec « Projet 360 / NOVA ». C'est une mémoire consultable et so
 | `npm run cache:clear` | Vide le cache des réponses du chat (`.cache/llm/`) |
 | `npm run precompute` | Pré-enregistre les réponses aux questions d'exemple et aux questions pièges (`data/precomputed/`, à relire) |
 | `npm run worker:deploy` | Redéploie le relais Cloudflare du chat avec la mémoire à jour (après un nouvel événement) |
+| `npm run verif` | Vérification d'avant-scène (état propre, clé, serveur local, site, relais, zip) |
+| `npm run repetition:charger` / `repetition:reset` | Installe la répétition 2 (U1) sans quota, puis remet le baseline |

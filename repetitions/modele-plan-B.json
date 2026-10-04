@@ -1,0 +1,35 @@
+{
+  "_comment": "MODÈLE D'ENTRAÎNEMENT AU PLAN B (saisie manuelle si l'analyse automatique est indisponible). Exemple : Sophie accepte SEC-210. Remplacer EVT-01_xxx par l'identifiant réel affiché après l'ingestion, et les repères L… par les bonnes lignes. Supprimer cette ligne _comment avant d'enregistrer.",
+  "version": "U1",
+  "label": "U1 — SEC-210 accepté par la sécurité (2 oct. 2026)",
+  "asOf": "2026-10-02T14:05:00",
+  "event": {
+    "title": "Courriel de Sophie Lambert : acceptation sécurité de SEC-210",
+    "summary": "Statut du problème : le re-test de l'export CSV est réussi. Décision : Sophie (sécurité, autorité de validation) accepte SEC-210. Aucune autre condition n'est touchée.",
+    "sources": [{ "s": "EVT-01_xxx", "r": "L6-L9" }]
+  },
+  "changes": [
+    { "what": "GL-1 — Validation sécurité de SEC-210", "before": "Correctif livré le 19 sept., non accepté (EN VALIDATION)", "after": "Accepté par la sécurité le 2 oct.", "sources": [{ "s": "EVT-01_xxx", "r": "L8" }, { "s": "SEC-210", "r": "L25" }] }
+  ],
+  "affected": [
+    { "ref": "Q08", "impact": "La sécurité est désormais acceptée (livré le 19 sept., validé le 2 oct.).", "sources": [{ "s": "EVT-01_xxx", "r": "L8" }] },
+    { "ref": "Q10", "impact": "Il reste deux conditions de go-live : ACC-303 et le runbook.", "sources": [{ "s": "EVT-01_xxx", "r": "L8" }, { "s": "M06", "r": "L11" }] },
+    { "ref": "A-01", "impact": "Action réalisée.", "sources": [{ "s": "EVT-01_xxx", "r": "L8" }] }
+  ],
+  "unchanged": [
+    { "ref": "GL-2", "why": "Aucune preuve de fermeture d'ACC-303 dans l'événement.", "sources": [{ "s": "ACC-303", "r": "L16" }] },
+    { "ref": "GL-3", "why": "Aucune preuve d'approbation du runbook dans l'événement.", "sources": [{ "s": "OPS-601", "r": "L16" }] },
+    { "ref": "Date du 22 oct.", "why": "Toujours conditionnelle ; aucune décision du comité dans l'événement.", "sources": [{ "s": "M06", "r": "L16" }] }
+  ],
+  "patch": {
+    "goLiveConditions": [
+      { "id": "GL-1", "title": "Validation sécurité de SEC-210", "approver": "Sophie Lambert (sécurité)", "status": "ACCEPTÉ le 2 oct. (re-test réussi)", "level": "ok", "actions": ["A-01"], "sources": [{ "s": "EVT-01_xxx", "r": "L8" }] }
+    ],
+    "actions": [
+      { "id": "A-01", "title": "Faire le re-test sécurité de SEC-210 et rendre une décision d'acceptation écrite", "owner": "Sophie Lambert", "ownerStatus": "confirmé", "due": "fait le 2 oct.", "origin": "engagement documenté", "condition": "GL-1", "status": "terminé", "sources": [{ "s": "EVT-01_xxx", "r": "L8" }] }
+    ],
+    "timeline": [
+      { "date": "2026-10-02", "type": "validation", "topic": "securite", "title": "Sophie Lambert accepte SEC-210 (re-test réussi)", "sources": [{ "s": "EVT-01_xxx", "r": "L8" }] }
+    ]
+  }
+}
