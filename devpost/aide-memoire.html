@@ -65,7 +65,7 @@
 <li>Chaque changement est sourcé (nouvelle source + corpus). Vérifier les calculs de dates.</li>
 <li>Le baseline reste intact. Ensuite : <code>npm run worker:deploy</code>, puis commit + push (site à jour en ≈ 1 min).</li>
 <li>Fichiers : glisser-déposer (eml, pdf, xlsx, png…). Captures transcrites automatiquement : <b>relire contre l'image</b>.</li>
-<li>Si l'analyse LLM échoue : remplir le JSON à la main dans le formulaire (il est éditable).</li>
+<li><b>Plan B</b> si l'analyse LLM échoue (quota) : les sources restent ingérées, un brouillon vide s'affiche → le remplir à la main (changes, affected, unchanged, patch), puis enregistrer.</li>
 </ul>
 
 <h2>Questions probables du jury</h2>
@@ -89,7 +89,7 @@
 <h2>Chiffres à citer</h2>
 <p style="margin:0">64 fichiers · 8 captures transcrites · 35 événements · 7 décisions · <b>8 contradictions résolues</b> · 13 actions (5 engagements, 8 recommandations) · 8 informations manquantes · 278 citations vérifiées · brief 1 page · baseline intact.</p>
 
-<div class="warn"><b>Avant de monter :</b> ouvrir le site et l'onglet « Mise à jour » en local (<code>npm run dev</code>) ; vérifier que le sélecteur ne montre que le Baseline ; garder le zip prêt ; ménager le quota Gemini.</div>
+<div class="warn"><b>Avant de monter :</b> ouvrir le site et l'onglet « Mise à jour » en local (<code>npm run dev</code>) ; vérifier que le sélecteur ne montre que le Baseline ; garder le zip prêt. <b>Quota Gemini</b> : ne plus lancer d'analyse ni de question libre la veille et le matin (20 requêtes/jour/modèle, remise à zéro vers 3 h).</div>
 </div>
 </div>
 </body>

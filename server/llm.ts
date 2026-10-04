@@ -100,16 +100,23 @@ const isQuota = (e: unknown) => e instanceof ApiError && e.status === 429;
  * - surcharge (503/500) : 1 nouvelle tentative sur le même modèle, puis modèle suivant ;
  * - quota épuisé (429) : modèle suivant immédiatement.
  */
-function geminiLadder(model: string): string[] {
-  const fallbacks = (process.env.GEMINI_FALLBACK_MODELS || process.env.GEMINI_FALLBACK_MODEL || "gemini-flash-lite-latest,gemini-2.5-flash-lite,gemini-3.1-flash-lite")
+// Deux échelles distinctes : le chat (modèles « lite ») ne consomme jamais le quota réservé à l'analyse d'impact.
+const DEFAULT_FALLBACKS: Record<Purpose, string> = {
+  chat: "gemini-3.1-flash-lite",
+  impact: "gemini-3.7-flash,gemini-3.6-flash,gemini-3.5-flash,gemini-3.1-flash-lite,gemini-flash-lite-latest",
+};
+
+function geminiLadder(model: string, purpose: Purpose): string[] {
+  const configured = purpose === "impact" ? process.env.GEMINI_IMPACT_FALLBACK_MODELS : process.env.GEMINI_FALLBACK_MODELS || process.env.GEMINI_FALLBACK_MODEL;
+  const fallbacks = (configured || DEFAULT_FALLBACKS[purpose])
     .split(",")
     .map((m) => m.trim())
     .filter(Boolean);
   return [...new Set([model, ...fallbacks])];
 }
 
-async function withGemini<T>(model: string, call: (m: string) => Promise<T>): Promise<{ value: T; model: string }> {
-  const ladder = geminiLadder(model);
+async function withGemini<T>(model: string, purpose: Purpose, call: (m: string) => Promise<T>): Promise<{ value: T; model: string }> {
+  const ladder = geminiLadder(model, purpose);
   let last: unknown;
   for (const m of ladder) {
     for (let attempt = 0; attempt < 2; attempt++) {
@@ -143,9 +150,9 @@ function geminiError(e: unknown, models: string): Error {
   return e instanceof Error ? e : new Error(String(e));
 }
 
-async function gemini(model: string, opts: { rules: string; knowledge: string; maxTokens: number; json?: boolean }, turns: Turn[]): Promise<Completion> {
+async function gemini(model: string, opts: { purpose: Purpose; rules: string; knowledge: string; maxTokens: number; json?: boolean }, turns: Turn[]): Promise<Completion> {
   const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
-  const { value, model: used } = await withGemini(model, async (m) => {
+  const { value, model: used } = await withGemini(model, opts.purpose, async (m) => {
     const res = await ai.models.generateContent({
       model: m,
       contents: turns.map((t) => ({ role: t.role === "assistant" ? "model" : "user", parts: [{ text: t.content }] })),
@@ -190,7 +197,7 @@ export async function transcribeImage(data: Buffer, mimeType: "image/png" | "ima
     return msg.content.map((b) => (b.type === "text" ? b.text : "")).join("");
   }
   const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
-  const { value } = await withGemini(model, async (m) => {
+  const { value } = await withGemini(model, "impact", async (m) => {
     const res = await ai.models.generateContent({
       model: m,
       contents: [{ role: "user", parts: [{ inlineData: { mimeType, data: data.toString("base64") } }, { text: TRANSCRIBE_PROMPT }] }],

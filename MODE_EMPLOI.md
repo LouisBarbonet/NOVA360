@@ -49,7 +49,7 @@ Mémoire opérationnelle du projet NOVA, établie à partir des 64 fichiers du c
 - **Claude Code (Claude Opus 5.5)** : lecture du corpus, transcription des 8 captures d'écran, rédaction de la mémoire de référence, développement.
 - **Claude Haiku 4.5** (API, configurable via `NOVA_MODEL`) : chat en langage naturel. Le corpus complet et la mémoire sont envoyés en contexte avec mise en cache ; il n'y a pas de base vectorielle.
 - **Claude Sonnet 5.5** (configurable via `NOVA_IMPACT_MODEL`) : brouillon d'analyse d'impact d'un nouvel événement.
-- **Google Gemini Flash** (secours, palier gratuit, `NOVA_PROVIDER=gemini`) : même rôle que Claude pour le chat, l'analyse d'impact et la transcription des captures. Le quota gratuit est compté **par modèle** (ex. 20 requêtes par jour) : en cas de quota épuisé ou de surcharge, l'application bascule automatiquement sur les modèles de repli (`GEMINI_FALLBACK_MODELS`).
+- **Google Gemini Flash** (secours, palier gratuit, `NOVA_PROVIDER=gemini`) : même rôle que Claude pour le chat, l'analyse d'impact et la transcription des captures. Le quota gratuit est compté **par modèle** (ex. 20 requêtes par jour) : en cas de quota épuisé ou de surcharge, l'application bascule automatiquement sur des modèles de repli. Deux échelles séparées : le chat n'utilise que des modèles « lite » (`GEMINI_FALLBACK_MODELS`), l'analyse d'impact et la transcription disposent de ≈ 6 modèles Flash (`GEMINI_IMPACT_FALLBACK_MODELS`). Si tout échoue, les sources restent ingérées et un **brouillon vide** est proposé pour une saisie manuelle (plan B).
 - **unpdf** (PDF), **SheetJS/xlsx** (Excel), décodeur MIME maison (courriels), **MiniSearch** (recherche), **Vite + TypeScript** (application).
 
 ## Traitements manuels

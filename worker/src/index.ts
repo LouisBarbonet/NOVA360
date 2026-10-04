@@ -68,7 +68,7 @@ async function callGemini(env: Env, model: string, system: string, turns: ChatTu
 /** Nouvelles tentatives si Gemini est surchargé, puis bascule sur le modèle de repli. */
 async function answer(env: Env, system: string, turns: ChatTurn[]): Promise<{ text: string; model: string }> {
   const primary = env.GEMINI_MODEL || "gemini-flash-lite-latest";
-  const fallback = env.GEMINI_FALLBACK_MODEL || "gemini-flash-latest";
+  const fallback = env.GEMINI_FALLBACK_MODEL || "gemini-3.1-flash-lite";
   const attempts = [primary, primary, fallback];
   for (let i = 0; ; i++) {
     try {

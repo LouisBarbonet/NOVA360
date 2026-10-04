@@ -109,13 +109,35 @@ async function ingestEvent(body: { title: string; text?: string; files?: { name:
     writeFileSync(join(EVENT_DIR, `${prefix()}_${safeName(f.name)}`), Buffer.from(f.data, "base64"));
   }
   runExtract();
-  const transcribed = await transcribePending();
+  // Plan B : une transcription impossible (quota, surcharge) ne bloque pas l'analyse ; l'image reste à transcrire à la main
+  let transcribed: string[] = [];
+  let transcriptionError = "";
+  try {
+    transcribed = await transcribePending();
+  } catch (e) {
+    transcriptionError = (e as Error).message;
+  }
   const fresh = newEventSources();
   if (!fresh.length) throw Object.assign(new Error("Aucune nouvelle source dans 09_Nouvel_evenement (collez un texte ou ajoutez un fichier, puis réessayez)."), { status: 400 });
 
   const nextVersion = `U${updateFiles().length + 1}`;
   const eventText = fresh.map((s) => `##### ${s.id} (${s.path})\n${s.segments.map((g) => `${g.ref}\t${g.text}`).join("\n")}`).join("\n\n");
-  const out = await complete({
+  const sourcesInfo = fresh.map((s) => ({ id: s.id, segments: s.segments.length }));
+  // Plan B : si le LLM est indisponible, on garde les sources ingérées et on propose un brouillon vide à remplir à la main
+  const skeleton = (reason: string) => ({
+    version: nextVersion,
+    label: `${nextVersion} — ${body.title || "nouvel événement"}`,
+    asOf: new Date().toISOString().slice(0, 19),
+    _erreur: `${reason} — complétez ce brouillon à la main (mêmes champs que ci-dessous), puis enregistrez.`,
+    event: { title: body.title || "", summary: "", sources: fresh.map((s) => ({ s: s.id, r: s.segments[0]?.ref ?? "L1" })) },
+    changes: [],
+    affected: [],
+    unchanged: [],
+    patch: { timeline: [] },
+  });
+  let out: Awaited<ReturnType<typeof complete>>;
+  try {
+    out = await complete({
     purpose: "impact",
     rules: RULES,
     knowledge: knowledge(memoryText("latest"), corpusText()),
@@ -139,15 +161,18 @@ Réponds UNIQUEMENT avec un objet JSON valide suivant ce schéma (sans texte aut
 ${IMPACT_SCHEMA}`,
       },
     ],
-  });
+    });
+  } catch (e) {
+    return { sources: sourcesInfo, transcribed, transcriptionError, llmError: (e as Error).message, draft: skeleton(`Analyse automatique indisponible : ${(e as Error).message}`) };
+  }
   const raw = out.text;
   let draft: unknown;
   try {
     draft = pruneUnchanged(parseLenient(raw) as Record<string, unknown>, fresh.map((s) => s.id));
   } catch {
-    draft = { version: nextVersion, _erreur: "Le modèle n'a pas produit de JSON valide : corrigez à la main.", brut: raw };
+    draft = { ...skeleton("Le modèle n'a pas produit de JSON exploitable"), brut: raw };
   }
-  return { sourceId: fresh.map((s) => s.id).join(", "), sources: fresh.map((s) => ({ id: s.id, segments: s.segments.length })), transcribed, provider: out.provider, model: out.model, draft };
+  return { sources: sourcesInfo, transcribed, transcriptionError, provider: out.provider, model: out.model, draft };
 }
 
 /** JSON du LLM : texte autour ignoré, puis réparation des fautes courantes (clé sans guillemets, virgule finale). */

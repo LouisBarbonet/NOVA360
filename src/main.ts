@@ -202,7 +202,13 @@ function bindEventForm() {
     const auto = (data.transcribed as string[]).length
       ? `<br>⚠ Captures transcrites automatiquement, <strong>à relire</strong> avant de valider : ${(data.transcribed as string[]).map((id) => `<a href="#/source/${encodeURIComponent(id)}">${esc(id)}</a>`).join(" · ")}`
       : "";
-    status.innerHTML = `Sources ingérées : ${sources}.${auto}<br>Relisez le brouillon ci-dessous : aucune approbation inventée, aucune autre condition fermée sans preuve.`;
+    const planB = data.llmError
+      ? `<br><strong>⚠ Analyse automatique indisponible</strong> (${esc(data.llmError)}). Plan B : le brouillon ci-dessous est vide ; complétez-le à la main à partir des sources ingérées, puis enregistrez.`
+      : "";
+    const noTranscription = data.transcriptionError
+      ? `<br><strong>⚠ Transcription automatique impossible</strong> (${esc(data.transcriptionError)}). Ouvrez la capture et décrivez son contenu dans le brouillon, ou collez-le comme texte dans un nouvel envoi.`
+      : "";
+    status.innerHTML = `Sources ingérées : ${sources}.${auto}${noTranscription}${planB}<br>Relisez le brouillon ci-dessous : aucune approbation inventée, aucune autre condition fermée sans preuve.`;
     save.hidden = false;
     (save.elements.namedItem("json") as HTMLTextAreaElement).value = JSON.stringify(data.draft, null, 2);
   });
