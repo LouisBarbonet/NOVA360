@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Aide-mémoire — questions du jury (passe 3)</title>
+<style>
+  @page { size: letter; margin: 8mm 9mm; }
+  * { box-sizing: border-box; }
+  body { font: 9.6px/1.32 system-ui, "Segoe UI", sans-serif; color: #1b1f24; margin: 0; }
+  h1 { font-size: 15px; margin: 0 0 3px; }
+  h2 { font-size: 10.5px; margin: 6px 0 3px; padding-bottom: 1px; border-bottom: 1.5px solid #1f4e8c; color: #1f4e8c; text-transform: uppercase; letter-spacing: .03em; }
+  .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 0 11px; }
+  .q { margin: 0 0 4px; padding: 3px 5px; border-left: 3px solid #1f4e8c; background: #f4f7fb; }
+  .q b.t { display: block; color: #1f4e8c; }
+  .show { color: #1d7a46; font-weight: 600; }
+  table { border-collapse: collapse; width: 100%; }
+  td, th { padding: 2px 4px; vertical-align: top; border-bottom: 1px solid #e3e6ea; text-align: left; }
+  th { font-size: 8.8px; color: #5d6673; text-transform: uppercase; }
+  .tip { background: #fdf1d8; border-left: 4px solid #8a5a00; padding: 3px 6px; margin-top: 4px; }
+  .sub { color: #5d6673; margin: 0 0 4px; }
+</style>
+</head>
+<body>
+<h1>Aide-mémoire — réponses aux questions du jury (passe 3)</h1>
+<p class="sub">Règle d'or : <b>répondre en une phrase, puis montrer la preuve à l'écran</b> (<span class="show">vert</span> = ce que le pilote affiche). Si on ne sait pas : « Ce n'est pas documenté dans le corpus ; voici ce qui l'est… »</p>
+
+<div class="cols">
+<div>
+<h2>Fiabilité</h2>
+<div class="q"><b class="t">Comment savez-vous que vos réponses sont justes ?</b>
+Chaque affirmation de la mémoire est une citation (fichier + ligne, page, cellule ou capture). Un script vérifie automatiquement les <b>278 citations</b> contre le corpus, et 44 tests couvrent le reste. Les réponses ont été relues par l'équipe. <span class="show">→ Q01–Q10, cliquer une preuve : passage surligné.</span></div>
+<div class="q"><b class="t">Montrez la preuve de Q07. Pourquoi E03 seul ne suffit-il pas ?</b>
+La décision vient de l'ADR-007 (23 juillet). E03 est la déclaration du <b>fournisseur</b>, et son PDF joint est <b>le même fichier</b> que le schéma v2 : ce n'est pas une confirmation indépendante. La vérification indépendante est celle de l'équipe architecture (M03, ligne 5). Limite : il n'y a pas de preuve technique brute. <span class="show">→ Q07 → M03 L5.</span></div>
+<div class="q"><b class="t">Pourquoi 204 000 $ et pas 222 000 $ ?</b>
+180 000 $ du contrat + 24 000 $ de CR-01, <b>approuvé</b> le 14 août. CR-04 (18 000 $) n'est qu'un <b>brouillon</b> : sans numéro d'approbation ni signature, et reporté en phase 2. Payé : 132 000 $. <span class="show">→ Budget et factures.</span></div>
+<div class="q"><b class="t">Que faites-vous quand deux sources se contredisent ?</b>
+On tranche par l'<b>autorité</b> (comité, responsable désigné, ticket) et la <b>date des faits</b>, jamais par la date du fichier. Exemple C-02 : le registre est daté du 29 sept., mais sa ligne date du 9, et le ticket a été fermé le 17. Exemple C-01 : le plan v3 dit le 15 oct., mais le comité a décidé le 22. <span class="show">→ Contradictions.</span></div>
+
+<h2>IA et méthode</h2>
+<div class="q"><b class="t">Et si l'IA invente ?</b>
+Il y a trois barrières. 1) Le validateur rejette toute citation inexistante, et le chat l'affiche en <b>rouge</b>. 2) Les garde-fous retirent du brouillon tout changement qui ne cite pas la nouvelle source. 3) La relecture humaine est obligatoire. Cas réel : 3 repères inventés et une formulation trop affirmative ont été détectés et corrigés.</div>
+<div class="q"><b class="t">Qu'avez-vous fait à la main ?</b>
+La transcription relue des 8 captures, la relecture de la mémoire et des 10 réponses, la relecture des 12 réponses pré-enregistrées, et la relecture de tout brouillon de mise à jour. Outils : Claude Code (rédaction et développement), Gemini (chat de démo). Tout est documenté dans le mode d'emploi.</div>
+<div class="q"><b class="t">Pourquoi pas de RAG ni de base vectorielle ?</b>
+Le corpus tient en entier dans le contexte du modèle : aucune information n'est perdue par une recherche imparfaite, et c'est plus simple à auditer.</div>
+<div class="q"><b class="t">Et si Gemini tombe pendant la démo ?</b>
+La chaîne bascule entre 6 modèles. Si tout échoue, les sources restent ingérées et on remplit le brouillon à la main (plan B). Les réponses pré-enregistrées, le site et l'export hors ligne ne dépendent pas de l'IA.</div>
+</div>
+
+<div>
+<h2>Nouvel événement</h2>
+<div class="q"><b class="t">Et si l'événement est une capture d'écran, un PDF, un Excel ?</b>
+Tous les formats du corpus sont acceptés. Les pièces jointes d'un courriel deviennent des sources citables. Les captures sont transcrites automatiquement, marquées <b>« à relire »</b> et comparées à l'image. <span class="show">→ source PJ1 : image + avertissement.</span></div>
+<div class="q"><b class="t">Et si l'événement contredit une décision du comité ?</b>
+Une <b>proposition</b> ne remplace pas une décision : la décision antérieure reste en vigueur, et l'on crée une action « faire trancher par le comité ». Seule une <b>décision</b> de l'autorité change l'état.</div>
+<div class="q"><b class="t">Comment éviter de fermer une condition par erreur ?</b>
+Chaque condition non touchée est listée dans « ce qui ne change pas ». Un élément modifié sans citer la nouvelle source est retiré automatiquement. Le baseline reste consultable avec le sélecteur de version.</div>
+<div class="q"><b class="t">Le brief est-il à jour après l'événement ?</b>
+Oui : les thèmes réécrits sont marqués « révisé · U1 », sous un encadré des changements. Il tient toujours sur une page. Les résultats sont aussi poussés dans le dépôt (RESULTATS.md, livrables/U1/).</div>
+
+<h2>Exercice de réflexe : ce qui change / ce qui ne change pas</h2>
+<table>
+<tr><th>Événement</th><th>Change</th><th>Ne change pas</th></tr>
+<tr><td>Boréal <b>propose</b> le 29 oct.</td><td>Proposition consignée ; action « faire trancher » ; risque contractuel (fin du contrat le 31, soit 2 jours de marge)</td><td>Date approuvée = <b>22 oct.</b> ; les 3 conditions</td></tr>
+<tr><td>Sophie <b>accepte</b> SEC-210</td><td>GL-1 fermée ; Q08 = oui ; A-01 terminée</td><td>GL-2, GL-3 ; la date reste conditionnelle</td></tr>
+<tr><td>Boréal <b>livre</b> le correctif ACC-303</td><td>A-02 livrée ; re-test de Mélissa à faire</td><td><b>GL-2 reste ouverte</b> (livré ≠ validé)</td></tr>
+<tr><td>Runbook <b>reçu</b>, pas approuvé</td><td>Étapes 4 et 5 documentées ; test d'Olivier daté</td><td><b>GL-3 reste ouverte</b> jusqu'au go d'Olivier</td></tr>
+<tr><td>INV-003 <b>corrigée</b> (36 000 $)</td><td>Q06 et budget (facturé et admissible)</td><td>Conditions de go-live ; CR-04 toujours non approuvé</td></tr>
+<tr><td>Le comité <b>décide</b> le 29 oct.</td><td>Q01, Q03, brief, chronologie (nouvelle décision)</td><td>Les 3 conditions restent ouvertes ; le baseline reste intact</td></tr>
+</table>
+
+<h2>Limites à dire nous-mêmes</h2>
+<p style="margin:0">Échéances non documentées (re-test SEC-210, build ACC-303, runbook final) · acceptation du jalon 3 non prouvée · migration Canada prouvée par un compte rendu seulement · aucune instance go/no-go planifiée · le chat peut se tromper (les réponses relues font foi) · le quota Gemini gratuit est limité.</p>
+<div class="tip"><b>Si le jury pousse :</b> ne jamais inventer. Dire « non documenté », montrer la liste des informations manquantes (page Actions et risques), et proposer l'action qui obtiendrait l'information.</div>
+</div>
+</div>
+</body>
+</html>

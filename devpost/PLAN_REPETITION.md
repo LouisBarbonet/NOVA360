@@ -84,6 +84,14 @@ Le jury fictif pose ces questions, dans le désordre. Les réponses sont dans l'
 - Vérifier que les **3 limites** sont dites spontanément par le narrateur.
 - Vérifier que la démo tient en **6 minutes**.
 
+## Après la démo (consigne Loto-Québec : résultats finaux dans le dépôt)
+
+```
+npm run package        # régénère livrables/U1/, RESULTATS.md et le zip
+npm run worker:deploy  # le chat en ligne connaît la nouvelle version
+git add -A && git commit -m "Résultats après la nouvelle information (U1)" && git push
+```
+
 ## Juste avant de monter
 
 ```

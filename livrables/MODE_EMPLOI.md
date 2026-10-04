@@ -16,6 +16,7 @@ Mémoire opérationnelle du projet NOVA, établie à partir des 64 fichiers du c
   - Le `.env` est relu à chaque question : on peut changer de modèle ou de fournisseur sans redémarrer.
   - **Cache des réponses** : une question identique (casse, espaces et ponctuation ignorés), posée sur la même version de la mémoire, est servie depuis `.cache/llm/` sans consommer de quota (indicateur ⚡ dans le chat). Une mise à jour de la mémoire invalide le cache. `npm run cache:clear` le vide. Les analyses d'impact ne sont pas mises en cache, pour pouvoir relancer un brouillon.
 
+- **Résultats sans exécuter de code** : [RESULTATS.md](RESULTATS.md) (à la racine du dépôt) liste tous les livrables par version et résume les réponses Q01–Q10 avec leurs preuves ; l'export hors ligne `NOVA360_remise.zip` est versionné dans le dépôt.
 - **Livrables hors application** : `livrables/<version>/` contient le brief (Markdown + PDF d'une page), les réponses Q01–Q10 avec extraits, la mémoire et le dossier de décisions. On les régénère avec `npm run export` ; `npm run package` refait en plus le zip de remise `NOVA360_remise.zip`.
 
 ## Naviguer

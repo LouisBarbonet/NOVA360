@@ -243,4 +243,52 @@ for (const v of versionsToExport) {
   console.log(`✓ ${dir}`);
 }
 copyFileSync("MODE_EMPLOI.md", join(OUT, "MODE_EMPLOI.md"));
-console.log(`Livrables écrits dans ${OUT}/ (${versionsToExport.join(", ")})`);
+
+// RESULTATS.md : point d'entrée pour une évaluation SANS exécuter le code (lecture directe sur GitHub)
+function resultats(): string {
+  const latest = versionsToExport[versionsToExport.length - 1];
+  const m = applyUpdates(baseline, updates, latest);
+  const first = (l: Cite[]) => l.slice(0, 3).map((c) => `\`${c.s}\` ${c.r}`).join(" · ");
+  const versionRows = versionsToExport.map((v) => {
+    const u = updates.find((x) => x.version === v);
+    const label = u ? u.label : baseline.label;
+    const files = [
+      `[Brief (PDF)](livrables/${v}/1_BRIEF.pdf)`,
+      `[Brief](livrables/${v}/1_BRIEF.md)`,
+      `[Q01–Q10](livrables/${v}/2_REPONSES_Q01-Q10.md)`,
+      `[Mémoire](livrables/${v}/3_MEMOIRE.md)`,
+      `[Dossier de décisions](livrables/${v}/4_DOSSIER_DECISIONS.md)`,
+      ...(u ? [`[**Mise à jour : changements, impacts, actions**](livrables/${v}/5_MISE_A_JOUR.md)`] : []),
+    ];
+    return `| **${v}** | ${cell(label)} | ${files.join(" · ")} |`;
+  });
+  return `# Résultats finaux — NOVA 360
+
+> Tous les résultats sont consultables **directement sur GitHub, sans exécuter de code**. Fichier généré par \`npm run package\` à partir de la mémoire validée (chaque citation est vérifiée contre le corpus).
+> Application en ligne (optionnelle) : https://louisbarbonet.github.io/NOVA360/ · Export hors ligne : [NOVA360_remise.zip](NOVA360_remise.zip) (ouvrir \`dist/index.html\`).
+
+## Livrables par version (le baseline est conservé)
+
+| Version | État | Fichiers |
+|---|---|---|
+${versionRows.join("\n")}
+
+- **Mode d'emploi** (ouverture, navigation, outils, étapes manuelles, limites) : [MODE_EMPLOI.md](MODE_EMPLOI.md)
+- **Captures de l'application** : [devpost/captures/](devpost/captures/)
+- **Répétitions de mise à jour** (tests d'événements simulés) : [repetitions/README.md](repetitions/README.md)
+
+## Réponses aux dix questions — ${cell(m.label)}
+
+Réponse courte et preuves principales ; le détail, toutes les preuves et leurs extraits exacts sont dans [2_REPONSES_Q01-Q10.md](livrables/${latest}/2_REPONSES_Q01-Q10.md).
+
+| # | Question | Réponse | Preuves principales |
+|---|---|---|---|
+${m.answers.map((a) => `| ${a.id} | ${cell(a.question)} | ${cell(a.short)} | ${first(a.sources)} |`).join("\n")}
+
+## En chiffres
+
+${corpus.sources.length} fichiers sources · ${m.timeline.length} événements datés · ${m.decisions.length} décisions · ${m.contradictions.length} contradictions résolues · ${m.actions.length} actions (${m.actions.filter((a) => a.origin === "engagement documenté").length} engagements documentés, ${m.actions.filter((a) => a.origin !== "engagement documenté").length} recommandations de l'équipe) · ${m.missing.length} informations manquantes déclarées.
+`;
+}
+writeFileSync("RESULTATS.md", resultats());
+console.log(`Livrables écrits dans ${OUT}/ (${versionsToExport.join(", ")}) + RESULTATS.md`);

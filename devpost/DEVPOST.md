@@ -156,6 +156,7 @@ claude, claude-code, gemini, llm, typescript, javascript, html5, css3, vite, nod
 
 - https://louisbarbonet.github.io/NOVA360/
 - https://github.com/LouisBarbonet/NOVA360
+- Résultats consultables sans exécuter de code : https://github.com/LouisBarbonet/NOVA360/blob/main/RESULTATS.md
 
 ## Fichier à joindre (si Devpost le permet)
 

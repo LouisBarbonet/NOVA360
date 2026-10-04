@@ -2,6 +2,10 @@
 
 Défi Loto-Québec « Projet 360 / NOVA ». C'est une mémoire consultable et sourcée de l'état du projet au **30 septembre 2026, 09:00**, que l'on peut mettre à jour sans effacer le baseline.
 
+## ➜ Résultats finaux : [RESULTATS.md](RESULTATS.md)
+
+Tous les livrables sont consultables **directement dans ce dépôt, sans exécuter de code** : brief d'une page (PDF et Markdown), réponses Q01–Q10 sourcées, mémoire, dossier de décisions, mise à jour après la nouvelle information, mode d'emploi. Vous pouvez aussi télécharger l'export hors ligne [NOVA360_remise.zip](NOVA360_remise.zip) ou ouvrir l'application en ligne : https://louisbarbonet.github.io/NOVA360/
+
 ## Livrables (remise Devpost)
 
 | Livrable | Où le trouver |

@@ -240,7 +240,7 @@
   "answers": [
     {
       "id": "Q01", "question": "Quelle est la date de mise en production actuellement approuvée, et avec quelle réserve?",
-      "short": "Le 22 octobre 2026. Ce n'est pas un go garanti : la date est conditionnelle à trois éléments.",
+      "short": "Le 22 octobre 2026. Ce n'est pas un go garanti : la date est conditionnelle à trois éléments (validation sécurité de SEC-210, fermeture d'ACC-303, approbation du runbook avec retour arrière).",
       "detail": "Le comité de direction a approuvé le 22 octobre le 10 septembre (M04 L17-L23). Le comité du 26 septembre a précisé que la date reste conditionnelle à trois éléments : la validation sécurité de SEC-210, la fermeture d'ACC-303 et l'approbation du runbook incluant le retour arrière (M06 L11-L16). Nicolas a fait un rappel le 27 sept. : « ne pas communiquer le 22 comme un go garanti » (E09 L7). Au 30 sept., les trois conditions sont ouvertes. Le plan v3, qui indique encore le 15 oct., est périmé (voir C-01).",
       "sources": [{ "s": "M04", "r": "L17-L23" }, { "s": "M06", "r": "L11-L16" }, { "s": "E09", "r": "L3-L7" }]
     },

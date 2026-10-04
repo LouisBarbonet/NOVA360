@@ -27,8 +27,6 @@ dist-ssr
 .env
 .env.local
 
-# Paquet de remise (genere)
-NOVA360_remise.zip
 
 # Cache des réponses LLM (local)
 .cache/
